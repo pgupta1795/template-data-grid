@@ -6,6 +6,7 @@ import type {
   GridFeaturesConfig,
   GridMode,
 } from "@/types/grid-types"
+import type { GridSlots } from "@/types/slot-types"
 import type {
   RowVirtualizerInstance,
   ColVirtualizerInstance,
@@ -15,6 +16,8 @@ import type { ActiveEdit } from "@/features/editing/use-editing"
 export interface DataGridContextValue {
   table: Table<GridRow>
   isLoading: boolean
+  isRefetching: boolean
+  isFetchingNextPage: boolean
   density: GridDensity
   setDensity: (d: GridDensity) => void
   globalFilter: string
@@ -22,6 +25,8 @@ export interface DataGridContextValue {
   tableContainerRef: React.RefObject<HTMLDivElement | null>
   features?: GridFeaturesConfig
   mode?: GridMode
+  slots?: GridSlots
+  onRefresh?: () => void
   // Tree features
   handleExpand: (row: Row<GridRow>) => Promise<void>
   loadingRowIds: Set<string>

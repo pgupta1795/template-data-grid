@@ -17,6 +17,7 @@ import type {
   GridMode,
   GridFeaturesConfig,
 } from "@/types/grid-types"
+import type { GridSlots } from "@/types/slot-types"
 import type { GridColumnDef, ColumnType } from "@/types/column-types"
 import type { DataGridContextValue } from "@/components/data-grid/data-grid-context"
 import { useSorting } from "@/features/sorting/use-sorting"
@@ -36,6 +37,7 @@ import {
   useColVirtualizer,
 } from "@/features/virtualization/use-virtualization"
 import { useEditing } from "@/features/editing/use-editing"
+import { useLoadingState } from "@/features/loading/use-loading-state"
 
 export interface DataGridConfig<TData extends GridRow> {
   data: TData[]
@@ -43,8 +45,13 @@ export interface DataGridConfig<TData extends GridRow> {
   mode?: GridMode
   density?: GridDensity
   features?: GridFeaturesConfig
+  slots?: GridSlots
   getSubRows?: (row: TData) => TData[] | undefined
   onExpand?: (row: GridRow) => Promise<GridRow[]> | void
+  // External loading signals (e.g. from TanStack Query)
+  isRefetching?: boolean
+  isFetchingNextPage?: boolean
+  onRefresh?: () => void
 }
 
 export function useDataGrid<TData extends GridRow>(
@@ -56,6 +63,10 @@ export function useDataGrid<TData extends GridRow>(
     density: initialDensity = "normal",
     features,
     mode,
+    slots,
+    isRefetching: externalIsRefetching = false,
+    isFetchingNextPage: externalIsFetchingNextPage = false,
+    onRefresh,
   } = config
 
   const [density, setDensity] = React.useState<GridDensity>(initialDensity)
@@ -81,6 +92,14 @@ export function useDataGrid<TData extends GridRow>(
 
   // Editing
   const editingHook = useEditing(features?.editing)
+
+  // Loading state
+  const loadingState = useLoadingState({
+    enabled: features?.loading?.enabled,
+    isRefetching: externalIsRefetching,
+    isFetchingNextPage: externalIsFetchingNextPage,
+    isMutating: editingHook.mutatingRowIds.size > 0,
+  })
 
   // Lazy tree expand
   const { loadingRowIds, handleExpand } = useLazyExpand({
@@ -255,7 +274,9 @@ export function useDataGrid<TData extends GridRow>(
 
   return {
     table: table as unknown as Table<GridRow>,
-    isLoading: false,
+    isLoading: loadingState.isInitialLoading,
+    isRefetching: loadingState.isRefetching,
+    isFetchingNextPage: loadingState.isFetchingNextPage,
     density,
     setDensity,
     globalFilter: filteringHook.globalFilter,
@@ -263,6 +284,8 @@ export function useDataGrid<TData extends GridRow>(
     tableContainerRef,
     features,
     mode,
+    slots,
+    onRefresh,
     handleExpand: handleExpand as (row: import("@tanstack/react-table").Row<GridRow>) => Promise<void>,
     loadingRowIds,
     rowVirtualizer,

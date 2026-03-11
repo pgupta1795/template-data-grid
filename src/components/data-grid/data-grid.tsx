@@ -13,6 +13,9 @@ import { DataGridProvider, useDataGridContext } from "./data-grid-context"
 import { DataGridHeader } from "./data-grid-header"
 import { DataGridRow } from "./data-grid-row"
 import { DataGridEmpty } from "./data-grid-empty"
+import { DataGridSkeleton } from "./data-grid-skeleton"
+import { DataGridRowSkeleton } from "./data-grid-row-skeleton"
+import { DataGridToolbar } from "./data-grid-toolbar"
 import { cn } from "@/lib/utils"
 import {
   Table,
@@ -81,15 +84,14 @@ function DataGridBody() {
     mode,
     loadingRowIds,
     rowVirtualizer,
+    isFetchingNextPage,
   } = useDataGridContext()
 
   const isVirtualized = features?.virtualization?.enabled ?? false
   const isTreeMode = mode === "tree"
 
   // For tree mode use all rows (flat expanded list); for flat use center rows
-  const allRows = isTreeMode
-    ? table.getRowModel().rows
-    : undefined
+  const allRows = isTreeMode ? table.getRowModel().rows : undefined
 
   const topRows = table.getTopRows()
   const centerRows = isTreeMode ? [] : table.getCenterRows()
@@ -102,8 +104,11 @@ function DataGridBody() {
       bottomRows.length >
     0
 
-  const colCount =
-    table.getVisibleLeafColumns().length
+  const colCount = table.getVisibleLeafColumns().length
+  const visibleColumns = table.getVisibleLeafColumns().map((col) => ({
+    id: col.id,
+    meta: col.columnDef.meta,
+  }))
 
   // Determine which rows to render (virtual or all)
   const virtualItems = isVirtualized ? rowVirtualizer.getVirtualItems() : null
@@ -158,14 +163,20 @@ function DataGridBody() {
             <DataGridRow row={row as Row<GridRow>} />
             {/* Show skeleton children while lazy-fetching */}
             {isTreeMode && isLoading && (
-              <TreeSkeletonRows
-                depth={row.depth}
-                colCount={colCount}
-              />
+              <TreeSkeletonRows depth={row.depth} colCount={colCount} />
             )}
           </React.Fragment>
         )
       })}
+
+      {/* Infinite scroll — append skeleton rows while fetching next page */}
+      {isFetchingNextPage && (
+        <>
+          <DataGridRowSkeleton columns={visibleColumns} />
+          <DataGridRowSkeleton columns={visibleColumns} />
+          <DataGridRowSkeleton columns={visibleColumns} />
+        </>
+      )}
 
       {/* Bottom padding spacer for row virtualization */}
       {isVirtualized && paddingBottom > 0 && (
@@ -189,6 +200,62 @@ function DataGridBody() {
   )
 }
 
+function DataGridInner() {
+  const {
+    table,
+    isLoading,
+    features,
+    slots,
+    tableContainerRef,
+  } = useDataGridContext()
+
+  const skeletonRows = features?.loading?.skeletonRows ?? 8
+
+  // Derive visible columns for skeleton
+  const visibleColumns = table.getVisibleLeafColumns().map((col) => ({
+    id: col.id,
+    meta: col.columnDef.meta,
+  }))
+
+  // Compute total table width for column virtualization
+  const totalTableWidth = table
+    .getVisibleLeafColumns()
+    .reduce((sum, col) => sum + col.getSize(), 0)
+
+  return (
+    <>
+      {slots?.toolbar ? (
+        slots.toolbar({ table })
+      ) : (
+        <DataGridToolbar />
+      )}
+
+      <Table
+        containerRef={tableContainerRef}
+        containerClassName="overflow-auto rounded-md border border-border"
+        className="border-collapse text-sm"
+        style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
+      >
+        {isLoading ? (
+          <DataGridSkeleton
+            columns={visibleColumns}
+            skeletonRows={skeletonRows}
+            showHeaderSkeleton
+          />
+        ) : (
+          <>
+            <DataGridHeader />
+            <TableBody>
+              <DataGridBody />
+            </TableBody>
+          </>
+        )}
+      </Table>
+      {/* pagination placeholder — Phase 8 */}
+    </>
+  )
+}
+
 export interface DataGridProps<TData extends GridRow> {
   data: TData[]
   columns: GridColumnDef<TData>[]
@@ -199,19 +266,15 @@ export interface DataGridProps<TData extends GridRow> {
   className?: string
   getSubRows?: (row: TData) => TData[] | undefined
   onExpand?: (row: GridRow) => Promise<GridRow[]> | void
+  // External loading signals (e.g. from TanStack Query)
+  isRefetching?: boolean
+  isFetchingNextPage?: boolean
+  onRefresh?: () => void
 }
 
-export function DataGrid<TData extends GridRow>(
-  props: DataGridProps<TData>,
-) {
+export function DataGrid<TData extends GridRow>(props: DataGridProps<TData>) {
   const grid = useDataGrid(props)
-  const { table } = grid
   const densityVars = DENSITY_VARS[grid.density]
-
-  // Compute total table width for column virtualization
-  const totalTableWidth = table
-    .getVisibleLeafColumns()
-    .reduce((sum, col) => sum + col.getSize(), 0)
 
   return (
     <DataGridProvider value={grid}>
@@ -220,19 +283,7 @@ export function DataGrid<TData extends GridRow>(
         className={cn("relative w-full font-sans", props.className)}
         style={densityVars as React.CSSProperties}
       >
-        {/* toolbar placeholder — Phase 7 */}
-        <Table
-          containerRef={grid.tableContainerRef}
-          containerClassName="overflow-auto rounded-md border border-border"
-          className="border-collapse text-sm"
-          style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
-        >
-          <DataGridHeader />
-          <TableBody>
-            <DataGridBody />
-          </TableBody>
-        </Table>
-        {/* pagination placeholder — Phase 8 */}
+        <DataGridInner />
       </div>
     </DataGridProvider>
   )

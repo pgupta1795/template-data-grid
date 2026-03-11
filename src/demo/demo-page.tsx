@@ -39,10 +39,10 @@ export function DemoPage() {
     <div className="p-6 min-h-screen bg-background">
       <div className="mb-4">
         <h1 className="text-lg font-semibold">
-          BOM Data Grid — Phase 5
+          BOM Data Grid — Phase 7
         </h1>
         <p className="text-sm text-muted-foreground">
-          Tree mode · Lazy expand · Row & Column Virtualization
+          Toolbar · Skeleton loading · Selected rows action bar
         </p>
       </div>
 
@@ -85,6 +85,7 @@ export function DemoPage() {
               onMutate: simulateUpdateCell,
               onError: (err) => console.error("[grid mutation error]", err),
             },
+            loading: { enabled: true, skeletonRows: 10 },
           }}
         />
       )}
@@ -114,6 +115,7 @@ export function DemoPage() {
               onMutate: simulateUpdateCell,
               onError: (err) => console.error("[grid mutation error]", err),
             },
+            loading: { enabled: true, skeletonRows: 8 },
           }}
         />
       )}
