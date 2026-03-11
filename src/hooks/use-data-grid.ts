@@ -122,14 +122,22 @@ export function useDataGrid<TData extends GridRow>(
   const orderingHook = useColumnOrdering()
 
   // Convert TanStack Table sorting/filtering state to SortState[]/FilterState[]
-  const sortState: SortState[] = sortingHook.sortingState.map((s) => ({
-    columnId: s.id,
-    direction: s.desc ? ("desc" as const) : ("asc" as const),
-  }))
-  const filterState: FilterState[] = filteringHook.columnFilters.map((f) => ({
-    columnId: f.id,
-    value: f.value,
-  }))
+  const sortState = React.useMemo<SortState[]>(
+    () =>
+      sortingHook.sortingState.map((s) => ({
+        columnId: s.id,
+        direction: s.desc ? ("desc" as const) : ("asc" as const),
+      })),
+    [sortingHook.sortingState],
+  )
+  const filterState = React.useMemo<FilterState[]>(
+    () =>
+      filteringHook.columnFilters.map((f) => ({
+        columnId: f.id,
+        value: f.value,
+      })),
+    [filteringHook.columnFilters],
+  )
 
   // Paginated query (always called, enabled only when mode === 'paginated')
   const paginatedQuery = useQuery({
@@ -375,6 +383,11 @@ export function useDataGrid<TData extends GridRow>(
     containerRef: tableContainerRef,
   })
 
+  // Stable fetchNextPage reference
+  const stableFetchNextPage = React.useCallback(() => {
+    infiniteQuery.fetchNextPage()
+  }, [infiniteQuery.fetchNextPage])
+
   // Determine effective isLoading based on mode
   const isLoading =
     mode === "paginated"
@@ -383,41 +396,74 @@ export function useDataGrid<TData extends GridRow>(
         ? infiniteQuery.isLoading
         : loadingState.isInitialLoading
 
-  return {
-    table: table as unknown as Table<GridRow>,
-    isLoading,
-    isRefetching: loadingState.isRefetching,
-    isFetchingNextPage:
-      mode === "infinite"
-        ? infiniteQuery.isFetchingNextPage
-        : loadingState.isFetchingNextPage,
-    density,
-    setDensity,
-    globalFilter: filteringHook.globalFilter,
-    setGlobalFilter: filteringHook.setGlobalFilter,
-    tableContainerRef,
-    features,
-    mode,
-    slots,
-    onRefresh,
-    handleExpand: handleExpand as (
-      row: import("@tanstack/react-table").Row<GridRow>,
-    ) => Promise<void>,
-    loadingRowIds,
-    rowVirtualizer,
-    columnVirtualizer,
-    activeEdit: editingHook.activeEdit,
-    startEditing: editingHook.startEditing,
-    cancelEditing: editingHook.cancelEditing,
-    commitEditing: editingHook.commitEditing,
-    mutatingRowIds: editingHook.mutatingRowIds,
-    errorRowIds: editingHook.errorRowIds,
-    // Pagination
-    pagination,
-    setPagination,
-    paginatedTotal: paginatedQuery.data?.total,
-    // Infinite
-    hasNextPage: infiniteQuery.hasNextPage,
-    fetchNextPage: infiniteQuery.fetchNextPage,
-  }
+  return React.useMemo<DataGridContextValue>(
+    () => ({
+      table: table as unknown as Table<GridRow>,
+      isLoading,
+      isRefetching: loadingState.isRefetching,
+      isFetchingNextPage:
+        mode === "infinite"
+          ? infiniteQuery.isFetchingNextPage
+          : loadingState.isFetchingNextPage,
+      density,
+      setDensity,
+      globalFilter: filteringHook.globalFilter,
+      setGlobalFilter: filteringHook.setGlobalFilter,
+      tableContainerRef,
+      features,
+      mode,
+      slots,
+      onRefresh,
+      handleExpand: handleExpand as (
+        row: import("@tanstack/react-table").Row<GridRow>,
+      ) => Promise<void>,
+      loadingRowIds,
+      rowVirtualizer,
+      columnVirtualizer,
+      activeEdit: editingHook.activeEdit,
+      startEditing: editingHook.startEditing,
+      cancelEditing: editingHook.cancelEditing,
+      commitEditing: editingHook.commitEditing,
+      mutatingRowIds: editingHook.mutatingRowIds,
+      errorRowIds: editingHook.errorRowIds,
+      // Pagination
+      pagination,
+      setPagination,
+      paginatedTotal: paginatedQuery.data?.total,
+      // Infinite
+      hasNextPage: infiniteQuery.hasNextPage,
+      fetchNextPage: stableFetchNextPage,
+    }),
+    [
+      table,
+      isLoading,
+      loadingState.isRefetching,
+      loadingState.isFetchingNextPage,
+      mode,
+      infiniteQuery.isFetchingNextPage,
+      infiniteQuery.hasNextPage,
+      density,
+      setDensity,
+      filteringHook.globalFilter,
+      filteringHook.setGlobalFilter,
+      tableContainerRef,
+      features,
+      slots,
+      onRefresh,
+      handleExpand,
+      loadingRowIds,
+      rowVirtualizer,
+      columnVirtualizer,
+      editingHook.activeEdit,
+      editingHook.startEditing,
+      editingHook.cancelEditing,
+      editingHook.commitEditing,
+      editingHook.mutatingRowIds,
+      editingHook.errorRowIds,
+      pagination,
+      setPagination,
+      paginatedQuery.data?.total,
+      stableFetchNextPage,
+    ],
+  )
 }

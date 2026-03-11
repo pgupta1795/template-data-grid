@@ -11,6 +11,15 @@ import {
 } from "./filter-functions"
 import { fuzzyFilter } from "./fuzzy-filter"
 
+const FILTER_FNS = {
+  fuzzy: fuzzyFilter,
+  stringFilter,
+  dateRangeFilter,
+  multiValueFilter,
+  selectFilter,
+  booleanFilter,
+} as const
+
 function useDebounce<T extends (...args: never[]) => void>(
   fn: T | undefined,
   ms: number,
@@ -65,14 +74,7 @@ export function useFiltering(config: FilteringFeatureConfig | undefined) {
 
   const tableOptions = {
     manualFiltering: mode === "server",
-    filterFns: {
-      fuzzy: fuzzyFilter,
-      stringFilter,
-      dateRangeFilter,
-      multiValueFilter,
-      selectFilter,
-      booleanFilter,
-    },
+    filterFns: FILTER_FNS,
     globalFilterFn: "fuzzy" as const,
     onColumnFiltersChange: handleColumnFiltersChange,
     onGlobalFilterChange: setGlobalFilter,
