@@ -27,8 +27,14 @@ export interface DataGridProps<TData extends GridRow> {
 
 export function DataGrid<TData extends GridRow>(props: DataGridProps<TData>) {
   const grid = useDataGrid(props)
-  const rows = grid.table.getRowModel().rows
+  const { table } = grid
   const densityVars = DENSITY_VARS[grid.density]
+
+  // Split rows for row pinning support
+  const topRows = table.getTopRows()
+  const centerRows = table.getCenterRows()
+  const bottomRows = table.getBottomRows()
+  const hasRows = topRows.length + centerRows.length + bottomRows.length > 0
 
   return (
     <DataGridProvider value={grid}>
@@ -42,16 +48,26 @@ export function DataGrid<TData extends GridRow>(props: DataGridProps<TData>) {
           <table className="w-full border-collapse text-sm">
             <DataGridHeader />
             <tbody>
-              {rows.length === 0 ? (
+              {!hasRows ? (
                 <tr>
-                  <td colSpan={props.columns.length}>
+                  <td colSpan={props.columns.length + (props.features?.selection?.enabled ? 1 : 0)}>
                     <DataGridEmpty
                       slots={{ empty: props.slots?.emptyState }}
                     />
                   </td>
                 </tr>
               ) : (
-                rows.map(row => <DataGridRow key={row.id} row={row} />)
+                <>
+                  {topRows.map(row => (
+                    <DataGridRow key={row.id} row={row} pinned="top" />
+                  ))}
+                  {centerRows.map(row => (
+                    <DataGridRow key={row.id} row={row} />
+                  ))}
+                  {bottomRows.map(row => (
+                    <DataGridRow key={row.id} row={row} pinned="bottom" />
+                  ))}
+                </>
               )}
             </tbody>
           </table>

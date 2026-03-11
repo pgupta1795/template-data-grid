@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { Cell } from '@tanstack/react-table'
 import { Calendar, Check, Copy, X } from 'lucide-react'
 import type { GridRow } from '@/types/grid-types'
@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatNumber, formatDate } from '@/utils/formatters'
 import { cn } from '@/lib/utils'
+import { useDataGridContext } from './data-grid-context'
+import { getPinnedShadowClass } from '@/features/pinning/pinned-shadow'
 
 // ---------------------------------------------------------------------------
 // CopyButton
@@ -184,15 +186,31 @@ export interface DataGridCellProps {
 }
 
 export function DataGridCell({ cell, className }: DataGridCellProps) {
+  const { table } = useDataGridContext()
   const { column, row } = cell
   const meta = column.columnDef.meta as ColumnMeta | undefined
   const value = cell.getValue()
+
+  // Pinned column sticky styles
+  const isPinned = column.getIsPinned()
+  const leftCols = table.getLeftLeafColumns()
+  const rightCols = table.getRightLeafColumns()
+  const pinnedStyle: React.CSSProperties = isPinned
+    ? {
+        position: "sticky",
+        left: isPinned === "left" ? column.getStart("left") : undefined,
+        right: isPinned === "right" ? column.getAfter("right") : undefined,
+        zIndex: 1,
+      }
+    : {}
+  const shadowClass = getPinnedShadowClass(column, leftCols, rightCols)
 
   // 1. Custom render function takes priority
   if (typeof meta?.render === 'function') {
     const rendered = (meta.render as (value: unknown, row: GridRow) => React.ReactNode)(value, row.original)
     return (
       <td
+        style={pinnedStyle}
         className={cn(
           'px-[var(--cell-px)] py-[var(--cell-py)]',
           'border-r border-border/30 last:border-r-0',
@@ -200,6 +218,8 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
           'text-[length:var(--font-size)]',
           'transition-colors duration-100',
           'group-hover/row:bg-muted/30',
+          isPinned && 'bg-background',
+          shadowClass,
           className
         )}
       >
@@ -251,6 +271,7 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
 
   return (
     <td
+      style={pinnedStyle}
       className={cn(
         'px-[var(--cell-px)] py-[var(--cell-py)]',
         'border-r border-border/30 last:border-r-0',
@@ -260,6 +281,8 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
         'group-hover/row:bg-muted/30',
         type === 'number' && 'text-right',
         isDateCell && 'bg-orange-500/5',
+        isPinned && 'bg-background',
+        shadowClass,
         className
       )}
     >
