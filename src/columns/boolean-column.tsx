@@ -1,0 +1,73 @@
+import type { GridColumnDef, ColumnMeta } from '../types/column-types'
+import { Badge } from '../components/ui/badge'
+import { Checkbox } from '../components/ui/checkbox'
+import { Check, X } from 'lucide-react'
+import { cn } from '../utils/grid-utils'
+
+interface BooleanColumnOptions {
+  accessorKey: string
+  header: string
+  editable?: boolean
+  trueLabel?: string
+  falseLabel?: string
+  renderAs?: 'badge' | 'checkbox' | 'icon'
+  width?: number
+  meta?: Partial<ColumnMeta>
+  [key: string]: unknown
+}
+
+export function booleanColumn(options: BooleanColumnOptions): GridColumnDef {
+  const {
+    accessorKey, header, editable,
+    trueLabel = 'Yes', falseLabel = 'No',
+    renderAs = 'badge', width, meta: extraMeta, ...rest
+  } = options
+
+  return {
+    accessorKey,
+    header,
+    size: width ?? 100,
+    enableSorting: true,
+    meta: {
+      type: 'boolean',
+      editable: editable ?? false,
+      trueLabel,
+      falseLabel,
+      renderAs,
+      ...extraMeta,
+    },
+    cell: ({ getValue }) => {
+      const value = Boolean(getValue())
+
+      if (renderAs === 'checkbox') {
+        return (
+          <div className="flex justify-center pointer-events-none">
+            <Checkbox checked={value} disabled aria-label={value ? trueLabel : falseLabel} />
+          </div>
+        )
+      }
+
+      if (renderAs === 'icon') {
+        return value
+          ? <Check className="h-4 w-4 text-emerald-500" aria-label={trueLabel} />
+          : <X className="h-4 w-4 text-muted-foreground" aria-label={falseLabel} />
+      }
+
+      // default: badge
+      return (
+        <Badge
+          variant="outline"
+          className={cn(
+            'text-xs font-medium',
+            value
+              ? 'bg-emerald-500/10 text-emerald-700 border-emerald-200 dark:text-emerald-400 dark:border-emerald-800'
+              : 'text-muted-foreground'
+          )}
+        >
+          {value ? trueLabel : falseLabel}
+        </Badge>
+      )
+    },
+    ...rest,
+  } as GridColumnDef
+}
