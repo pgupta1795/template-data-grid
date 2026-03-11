@@ -127,3 +127,8 @@
     @apply font-mono;
     }
 }
+
+@keyframes flash-error {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: oklch(var(--destructive) / 0.12); }
+}

@@ -14,6 +14,12 @@ import { DataGridHeader } from "./data-grid-header"
 import { DataGridRow } from "./data-grid-row"
 import { DataGridEmpty } from "./data-grid-empty"
 import { cn } from "@/lib/utils"
+import {
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table"
 
 const DENSITY_VARS: Record<GridDensity, Record<string, string>> = {
   compact: {
@@ -50,8 +56,8 @@ const TreeSkeletonRows = memo(function TreeSkeletonRows({
   return (
     <>
       {[0, 1, 2].map((i) => (
-        <tr key={i} className="bg-background border-b border-border/50">
-          <td
+        <TableRow key={i} className="bg-background border-b border-border/50">
+          <TableCell
             colSpan={colCount}
             style={{
               padding: `6px 12px 6px ${(depth + 1) * 20 + 12}px`,
@@ -61,8 +67,8 @@ const TreeSkeletonRows = memo(function TreeSkeletonRows({
               className="h-3.5 rounded-sm bg-muted animate-pulse"
               style={{ width: `${55 + i * 15}%` }}
             />
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       ))}
     </>
   )
@@ -118,11 +124,11 @@ function DataGridBody() {
 
   if (!hasRows) {
     return (
-      <tr>
-        <td colSpan={colCount}>
+      <TableRow>
+        <TableCell colSpan={colCount}>
           <DataGridEmpty />
-        </td>
-      </tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
@@ -135,12 +141,12 @@ function DataGridBody() {
 
       {/* Top padding spacer for row virtualization */}
       {isVirtualized && paddingTop > 0 && (
-        <tr>
-          <td
+        <TableRow>
+          <TableCell
             colSpan={colCount}
             style={{ height: `${paddingTop}px`, padding: 0 }}
           />
-        </tr>
+        </TableRow>
       )}
 
       {/* Center rows */}
@@ -163,12 +169,12 @@ function DataGridBody() {
 
       {/* Bottom padding spacer for row virtualization */}
       {isVirtualized && paddingBottom > 0 && (
-        <tr>
-          <td
+        <TableRow>
+          <TableCell
             colSpan={colCount}
             style={{ height: `${paddingBottom}px`, padding: 0 }}
           />
-        </tr>
+        </TableRow>
       )}
 
       {/* Pinned bottom rows (always rendered, sticky) */}
@@ -215,20 +221,17 @@ export function DataGrid<TData extends GridRow>(
         style={densityVars as React.CSSProperties}
       >
         {/* toolbar placeholder — Phase 7 */}
-        <div
-          ref={grid.tableContainerRef}
-          className="overflow-auto rounded-md border border-border"
+        <Table
+          containerRef={grid.tableContainerRef}
+          containerClassName="overflow-auto rounded-md border border-border"
+          className="border-collapse text-sm"
+          style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
         >
-          <table
-            className="border-collapse text-sm"
-            style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
-          >
-            <DataGridHeader />
-            <tbody>
-              <DataGridBody />
-            </tbody>
-          </table>
-        </div>
+          <DataGridHeader />
+          <TableBody>
+            <DataGridBody />
+          </TableBody>
+        </Table>
         {/* pagination placeholder — Phase 8 */}
       </div>
     </DataGridProvider>

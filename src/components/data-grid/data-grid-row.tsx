@@ -5,6 +5,7 @@ import { DataGridCell } from "./data-grid-cell"
 import { GroupRow } from "@/features/grouping/group-row"
 import { useDataGridContext } from "./data-grid-context"
 import { cn } from "@/lib/utils"
+import { TableRow as ShadcnTableRow, TableCell } from "@/components/ui/table"
 
 interface DataGridRowProps {
   row: Row<GridRow>
@@ -14,7 +15,7 @@ interface DataGridRowProps {
 
 export const DataGridRow = memo(
   function DataGridRow({ row, pinned, className }: DataGridRowProps) {
-    const { mode, features, table, columnVirtualizer } =
+    const { mode, features, table, columnVirtualizer, mutatingRowIds, errorRowIds } =
       useDataGridContext()
 
     // Render group rows differently
@@ -24,6 +25,8 @@ export const DataGridRow = memo(
 
     const isTreeMode = mode === "tree"
     const isColVirtualized = features?.virtualization?.enabled ?? false
+    const isMutating = mutatingRowIds.has(row.id)
+    const isError = errorRowIds.has(row.id)
 
     // Tree depth tinting — subtle left border per depth level
     const depthStyle: React.CSSProperties =
@@ -82,12 +85,14 @@ export const DataGridRow = memo(
       )
 
       return (
-        <tr
+        <ShadcnTableRow
           className={cn(
             "group/row bg-background hover:bg-muted/30",
             "data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary",
             "transition-colors duration-100",
             pinned && "bg-muted/60 shadow-sm",
+            isMutating && "opacity-70 pointer-events-none",
+            isError && "animate-[flash-error_0.4s_ease]",
             className,
           )}
           data-selected={String(row.getIsSelected())}
@@ -98,24 +103,24 @@ export const DataGridRow = memo(
             <DataGridCell key={cell.id} cell={cell} />
           ))}
           {startPad > 0 && (
-            <td style={{ width: startPad, padding: 0 }} />
+            <TableCell style={{ width: startPad, padding: 0 }} />
           )}
           {visibleCenterCells.map((cell) => (
             <DataGridCell key={cell.id} cell={cell} />
           ))}
           {endPad > 0 && (
-            <td style={{ width: endPad, padding: 0 }} />
+            <TableCell style={{ width: endPad, padding: 0 }} />
           )}
           {rightCells.map((cell) => (
             <DataGridCell key={cell.id} cell={cell} />
           ))}
-        </tr>
+        </ShadcnTableRow>
       )
     }
 
     // Non-virtualized path
     return (
-      <tr
+      <ShadcnTableRow
         className={cn(
           "group/row bg-background hover:bg-muted/30",
           "data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary",
@@ -130,7 +135,7 @@ export const DataGridRow = memo(
         {row.getVisibleCells().map((cell) => (
           <DataGridCell key={cell.id} cell={cell} />
         ))}
-      </tr>
+      </ShadcnTableRow>
     )
   },
   (prev, next) =>

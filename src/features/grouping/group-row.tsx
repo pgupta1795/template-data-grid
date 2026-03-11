@@ -3,6 +3,7 @@ import type { Row } from "@tanstack/react-table"
 import type { GridRow } from "@/types/grid-types"
 import { ChevronRight, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TableRow, TableCell } from "@/components/ui/table"
 
 interface GroupRowProps {
   row: Row<GridRow>
@@ -12,14 +13,14 @@ export function GroupRow({ row }: GroupRowProps) {
   const isExpanded = row.getIsExpanded()
 
   return (
-    <tr
+    <TableRow
       className="bg-muted/50 border-b border-border cursor-pointer hover:bg-muted/70 transition-colors duration-100"
       onClick={() => row.toggleExpanded()}
     >
       {row.getVisibleCells().map((cell) => {
         if (cell.getIsGrouped()) {
           return (
-            <td
+            <TableCell
               key={cell.id}
               className="px-[var(--cell-px)] py-1.5 border-r border-border/30 last:border-r-0"
             >
@@ -36,13 +37,13 @@ export function GroupRow({ row }: GroupRowProps) {
                   ({row.subRows.length})
                 </span>
               </div>
-            </td>
+            </TableCell>
           )
         }
 
         if (cell.getIsAggregated()) {
           return (
-            <td
+            <TableCell
               key={cell.id}
               className={cn(
                 "px-[var(--cell-px)] py-1.5 border-r border-border/30 last:border-r-0",
@@ -54,18 +55,18 @@ export function GroupRow({ row }: GroupRowProps) {
                   cell.column.columnDef.cell,
                 cell.getContext(),
               )}
-            </td>
+            </TableCell>
           )
         }
 
         // Placeholder
         return (
-          <td
+          <TableCell
             key={cell.id}
             className="px-[var(--cell-px)] py-1.5 border-r border-border/30 last:border-r-0"
           />
         )
       })}
-    </tr>
+    </TableRow>
   )
 }

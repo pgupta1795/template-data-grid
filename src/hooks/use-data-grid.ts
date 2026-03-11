@@ -35,6 +35,7 @@ import {
   useRowVirtualizer,
   useColVirtualizer,
 } from "@/features/virtualization/use-virtualization"
+import { useEditing } from "@/features/editing/use-editing"
 
 export interface DataGridConfig<TData extends GridRow> {
   data: TData[]
@@ -77,6 +78,9 @@ export function useDataGrid<TData extends GridRow>(
   const rowPinningHook = useRowPinning(features?.rowPinning)
   const groupingHook = useGrouping(features?.grouping)
   const orderingHook = useColumnOrdering()
+
+  // Editing
+  const editingHook = useEditing(features?.editing)
 
   // Lazy tree expand
   const { loadingRowIds, handleExpand } = useLazyExpand({
@@ -263,5 +267,11 @@ export function useDataGrid<TData extends GridRow>(
     loadingRowIds,
     rowVirtualizer,
     columnVirtualizer,
+    activeEdit: editingHook.activeEdit,
+    startEditing: editingHook.startEditing,
+    cancelEditing: editingHook.cancelEditing,
+    commitEditing: editingHook.commitEditing,
+    mutatingRowIds: editingHook.mutatingRowIds,
+    errorRowIds: editingHook.errorRowIds,
   }
 }

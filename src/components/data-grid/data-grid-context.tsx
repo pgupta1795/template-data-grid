@@ -10,6 +10,7 @@ import type {
   RowVirtualizerInstance,
   ColVirtualizerInstance,
 } from "@/features/virtualization/use-virtualization"
+import type { ActiveEdit } from "@/features/editing/use-editing"
 
 export interface DataGridContextValue {
   table: Table<GridRow>
@@ -27,6 +28,13 @@ export interface DataGridContextValue {
   // Virtualization
   rowVirtualizer: RowVirtualizerInstance
   columnVirtualizer: ColVirtualizerInstance
+  // Editing
+  activeEdit: ActiveEdit | null
+  startEditing: (rowId: string, columnId: string, value: unknown) => void
+  cancelEditing: () => void
+  commitEditing: (value: unknown) => Promise<void>
+  mutatingRowIds: Set<string>
+  errorRowIds: Set<string>
 }
 
 export const DataGridContext =

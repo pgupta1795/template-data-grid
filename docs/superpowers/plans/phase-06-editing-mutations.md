@@ -113,7 +113,7 @@ All editors:
 
 ### `src/editors/text-editor.tsx`
 ```tsx
-// Plain <input type="text">
+// shadcn <Input type="text" />
 // Styles: same cell padding, font, fully transparent bg until focused
 // ring-2 ring-primary/60 ring-inset when focused
 // w-full, no border (ring replaces it)
@@ -121,7 +121,7 @@ All editors:
 
 ### `src/editors/number-editor.tsx`
 ```tsx
-// <input type="number"> or controlled text input with numeric validation
+// shadcn <Input type="number" /> or controlled Input with numeric validation
 // Right-aligned (text-right)
 // font-mono
 // Prevents non-numeric characters
@@ -171,7 +171,7 @@ All editors:
 
 ### `src/editors/code-editor.tsx`
 ```tsx
-// <textarea> (not <input>) in monospace font
+// shadcn <Textarea /> in monospace font (not <Input> — code is multiline)
 // Auto-sizes to content up to 4 lines, then scrollable
 // font-mono text-[12px], same cell padding
 // ring-2 ring-primary/60 ring-inset when focused
@@ -198,7 +198,7 @@ function DataGridCell({ cell, row }) {
   if (isEditing) {
     const EditorComponent = getEditor(cell.column.columnDef.meta?.type, cell.column.columnDef.meta?.renderEditor)
     return (
-      <td className={cn(cellBaseStyles, 'p-0 ring-2 ring-primary/60 ring-inset')}>
+      <TableCell className={cn(cellBaseStyles, 'p-0 ring-2 ring-primary/60 ring-inset')}>
         <EditorComponent
           value={editingCell.currentValue}
           onChange={updateValue}
@@ -208,19 +208,19 @@ function DataGridCell({ cell, row }) {
           columnId={cell.column.id}
           meta={cell.column.columnDef.meta!}
         />
-      </td>
+      </TableCell>
     )
   }
 
   return (
-    <td
+    <TableCell
       className={cn(cellBaseStyles, isEditable && 'cursor-text')}
       onDoubleClick={() => {
         if (isEditable) startEditing(row.id, cell.column.id, cell.getValue())
       }}
     >
       {/* normal cell render */}
-    </td>
+    </TableCell>
   )
 }
 ```

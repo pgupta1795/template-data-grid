@@ -3,6 +3,15 @@ import type { Column, Header } from "@tanstack/react-table"
 import type { GridRow } from "@/types/grid-types"
 import type { ColumnMeta, ColumnType } from "@/types/column-types"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { TableRow, TableCell } from "@/components/ui/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useDataGridContext } from "@/components/data-grid/data-grid-context"
 
 export function FilterRow() {
@@ -11,11 +20,11 @@ export function FilterRow() {
   const leafHeaderGroup = headerGroups[headerGroups.length - 1]
 
   return (
-    <tr className="bg-background border-b-2 border-border">
+    <TableRow className="bg-background border-b-2 border-border">
       {leafHeaderGroup.headers.map((header) => (
         <FilterRowCell key={header.id} header={header} />
       ))}
-    </tr>
+    </TableRow>
   )
 }
 
@@ -29,14 +38,14 @@ function FilterRowCell({
   const columnType = meta?.type ?? "string"
 
   return (
-    <td
+    <TableCell
       style={{ width: `${header.getSize()}px` }}
       className="px-[var(--cell-px)] py-1"
     >
       {!header.isPlaceholder && (
         <FilterRowControl column={column} columnType={columnType} meta={meta} />
       )}
-    </td>
+    </TableCell>
   )
 }
 
@@ -250,23 +259,29 @@ function SelectRowFilter({
   const current = (column.getFilterValue() as string[] | undefined) ?? []
 
   return (
-    <select
-      className={
-        className +
-        " w-full border border-border rounded-none bg-background appearance-none"
-      }
+    <Select
       value={current[0] ?? ""}
-      onChange={(e) => {
-        column.setFilterValue(e.target.value ? [e.target.value] : undefined)
+      onValueChange={(val) => {
+        column.setFilterValue(val && val !== "__all__" ? [val] : undefined)
       }}
     >
-      <option value="">All</option>
-      {items.map((item) => (
-        <option key={item.value} value={item.value}>
-          {item.label}
-        </option>
-      ))}
-    </select>
+      <SelectTrigger
+        className={
+          className +
+          " w-full border border-border rounded-none bg-background"
+        }
+      >
+        <SelectValue placeholder="All" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="__all__">All</SelectItem>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 
@@ -280,19 +295,21 @@ function BooleanRowFilter({ column }: { column: Column<GridRow, unknown> }) {
         const val = i === 0 ? "all" : i === 1 ? "true" : "false"
         const active = current === val
         return (
-          <button
+          <Button
             key={val}
+            variant={active ? "outline" : "ghost"}
+            size="xs"
             onClick={() =>
               column.setFilterValue(val === "all" ? undefined : val)
             }
-            className={`flex-1 h-7 text-[11px] border rounded-none transition-colors ${
+            className={`flex-1 h-7 text-[11px] rounded-none transition-colors ${
               active
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:border-foreground/30"
             }`}
           >
             {label}
-          </button>
+          </Button>
         )
       })}
     </div>

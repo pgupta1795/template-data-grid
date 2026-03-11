@@ -19,6 +19,17 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+async function simulateUpdateCell(
+  _rowId: string,
+  _columnId: string,
+  _value: unknown,
+): Promise<void> {
+  await delay(600 + Math.random() * 400)
+  if (Math.random() < 0.1) {
+    throw new Error(`Simulated save failure`)
+  }
+}
+
 type TabKey = "flat" | "tree"
 
 export function DemoPage() {
@@ -69,6 +80,11 @@ export function DemoPage() {
             rowPinning: { enabled: true },
             grouping: { enabled: true },
             virtualization: { enabled: true, rowHeight: 40, overscan: 5 },
+            editing: {
+              enabled: true,
+              onMutate: simulateUpdateCell,
+              onError: (err) => console.error("[grid mutation error]", err),
+            },
           }}
         />
       )}
@@ -93,6 +109,11 @@ export function DemoPage() {
             filtering: { enabled: true, mode: "client", filterRow: true },
             selection: { enabled: true, mode: "multi" },
             columnPinning: { enabled: true },
+            editing: {
+              enabled: true,
+              onMutate: simulateUpdateCell,
+              onError: (err) => console.error("[grid mutation error]", err),
+            },
           }}
         />
       )}

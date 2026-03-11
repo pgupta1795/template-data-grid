@@ -9,12 +9,12 @@ const STATUS_OPTIONS = [
 
 export const demoBomColumns = [
   stringColumn({ accessorKey: 'partNumber', header: 'Part Number', copyable: true }),
-  stringColumn({ accessorKey: 'description', header: 'Description', width: 280 }),
-  numberColumn({ accessorKey: 'quantity', header: 'Qty' }),
-  numberColumn({ accessorKey: 'unitPrice', header: 'Unit Price', format: 'currency' }),
-  selectColumn({ accessorKey: 'status', header: 'Status', options: STATUS_OPTIONS }),
-  multiValueColumn({ accessorKey: 'tags', header: 'Tags' }),
-  booleanColumn({ accessorKey: 'isActive', header: 'Active', renderAs: 'badge' }),
-  codeColumn({ accessorKey: 'internalCode', header: 'Code', copyable: true }),
-  dateColumn({ accessorKey: 'createdAt', header: 'Created' }),
+  stringColumn({ accessorKey: 'description', header: 'Description', width: 280, editable: true }),
+  numberColumn({ accessorKey: 'quantity', header: 'Qty', editable: true }),
+  numberColumn({ accessorKey: 'unitPrice', header: 'Unit Price', format: 'currency', editable: true }),
+  selectColumn({ accessorKey: 'status', header: 'Status', options: STATUS_OPTIONS, editable: true }),
+  multiValueColumn({ accessorKey: 'tags', header: 'Tags', editable: true }),
+  booleanColumn({ accessorKey: 'isActive', header: 'Active', renderAs: 'badge', editable: true }),
+  codeColumn({ accessorKey: 'internalCode', header: 'Code', copyable: true, editable: true }),
+  dateColumn({ accessorKey: 'createdAt', header: 'Created', editable: true }),
 ]

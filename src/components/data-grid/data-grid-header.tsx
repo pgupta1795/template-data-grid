@@ -1,60 +1,61 @@
-import React from "react"
-import { flexRender } from "@tanstack/react-table"
-import type { Header } from "@tanstack/react-table"
-import type { LucideIcon } from "lucide-react"
 import {
-  Type,
-  Hash,
-  Calendar,
-  List,
-  ChevronDown,
-  ToggleLeft,
-  Code2,
-  Sparkles,
-  GripVertical,
-  Pin,
-  PinOff,
-  Layers,
-} from "lucide-react"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ColumnFilterPopover } from "@/features/filtering/column-filter-popover"
+import { FilterRow } from "@/features/filtering/filter-row"
+import { getPinnedShadowClass } from "@/features/pinning/pinned-shadow"
+import { SortIndicator } from "@/features/sorting/sort-indicator"
+import { cn } from "@/lib/utils"
+import type { ColumnType } from "@/types/column-types"
+import type { GridRow } from "@/types/grid-types"
 import {
+  closestCenter,
   DndContext,
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
   type DragEndEvent,
 } from "@dnd-kit/core"
 import {
+  horizontalListSortingStrategy,
   SortableContext,
   useSortable,
-  horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import type { Header } from "@tanstack/react-table"
+import { flexRender } from "@tanstack/react-table"
+import type { LucideIcon } from "lucide-react"
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+  Calendar,
+  ChevronDown,
+  Code2,
+  GripVertical,
+  Hash,
+  Layers,
+  List,
+  Pin,
+  PinOff,
+  Sparkles,
+  ToggleLeft,
+  Type,
+} from "lucide-react"
+import React from "react"
 import { useDataGridContext } from "./data-grid-context"
-import { SortIndicator } from "@/features/sorting/sort-indicator"
-import { ColumnFilterPopover } from "@/features/filtering/column-filter-popover"
-import { FilterRow } from "@/features/filtering/filter-row"
-import { getPinnedShadowClass } from "@/features/pinning/pinned-shadow"
-import type { ColumnType } from "@/types/column-types"
-import type { GridRow } from "@/types/grid-types"
 
 const TYPE_ICONS: Record<string, { icon: LucideIcon; className: string }> = {
-  string:        { icon: Type,        className: "text-sky-500" },
-  number:        { icon: Hash,        className: "text-violet-500" },
-  date:          { icon: Calendar,    className: "text-orange-500" },
-  "multi-value": { icon: List,        className: "text-teal-500" },
-  select:        { icon: ChevronDown, className: "text-amber-500" },
-  boolean:       { icon: ToggleLeft,  className: "text-pink-500" },
-  code:          { icon: Code2,       className: "text-emerald-500" },
-  custom:        { icon: Sparkles,    className: "text-purple-500" },
+  string: { icon: Type, className: "text-sky-500" },
+  number: { icon: Hash, className: "text-violet-500" },
+  date: { icon: Calendar, className: "text-orange-500" },
+  "multi-value": { icon: List, className: "text-teal-500" },
+  select: { icon: ChevronDown, className: "text-amber-500" },
+  boolean: { icon: ToggleLeft, className: "text-pink-500" },
+  code: { icon: Code2, className: "text-emerald-500" },
+  custom: { icon: Sparkles, className: "text-purple-500" },
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,7 +97,7 @@ function SortableHeaderCell({
   const shadowClass = getPinnedShadowClass(
     column,
     table.getLeftLeafColumns(),
-    table.getRightLeafColumns(),
+    table.getRightLeafColumns()
   )
 
   const pinnedStyle: React.CSSProperties = isPinned
@@ -119,32 +120,30 @@ function SortableHeaderCell({
   }
 
   return (
-    <th
+    <TableHead
       ref={setNodeRef}
       style={thStyle}
       colSpan={header.colSpan}
       className={cn(
-        "group/header px-[var(--cell-px)] h-[var(--header-height)]",
-        "text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground",
-        "select-none whitespace-nowrap border-r border-border/30 last:border-r-0 relative",
+        "group/header h-(--header-height) px-(--cell-px)",
+        "text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase",
+        "relative border-r border-border/30 whitespace-nowrap select-none last:border-r-0",
         canSort && "cursor-pointer",
         isResizing && "select-none",
         isPinned && "bg-background",
-        shadowClass,
+        shadowClass
       )}
       onClick={
-        canSort
-          ? (e) => column.toggleSorting(undefined, e.shiftKey)
-          : undefined
+        canSort ? (e) => column.toggleSorting(undefined, e.shiftKey) : undefined
       }
     >
       {header.isPlaceholder ? null : (
-        <div className="flex items-center gap-1 h-full">
+        <div className="flex h-full items-center gap-1">
           {/* Drag handle */}
           <span
             {...attributes}
             {...listeners}
-            className="opacity-0 group-hover/header:opacity-60 hover:!opacity-100 cursor-grab active:cursor-grabbing shrink-0 transition-opacity"
+            className="shrink-0 cursor-grab opacity-0 transition-opacity group-hover/header:opacity-60 hover:opacity-100! active:cursor-grabbing"
             onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="h-3 w-3 text-muted-foreground" />
@@ -156,14 +155,14 @@ function SortableHeaderCell({
             />
           )}
 
-          <span className="shrink-0 min-w-0 truncate flex-1">
+          <span className="min-w-0 flex-1 shrink-0 truncate">
             {flexRender(column.columnDef.header, header.getContext())}
           </span>
 
           {/* Grouping indicator */}
           {isGrouped && (
             <button
-              className="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+              className="shrink-0 opacity-70 transition-opacity hover:opacity-100"
               onClick={(e) => {
                 e.stopPropagation()
                 column.toggleGrouping()
@@ -199,16 +198,14 @@ function SortableHeaderCell({
       {/* Resize handle */}
       <div
         className={cn(
-          "absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors",
-          column.getIsResizing()
-            ? "bg-primary w-[3px]"
-            : "hover:bg-primary/40",
+          "absolute top-0 right-0 h-full w-1 cursor-col-resize transition-colors",
+          column.getIsResizing() ? "w-[3px] bg-primary" : "hover:bg-primary/40"
         )}
         onMouseDown={header.getResizeHandler()}
         onTouchStart={header.getResizeHandler()}
         onClick={(e) => e.stopPropagation()}
       />
-    </th>
+    </TableHead>
   )
 }
 
@@ -234,7 +231,7 @@ function HeaderActionMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="opacity-0 group-hover/header:opacity-60 hover:!opacity-100 transition-opacity inline-flex items-center justify-center"
+        className="inline-flex items-center justify-center opacity-0 transition-opacity group-hover/header:opacity-60 hover:opacity-100!"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
         aria-label="Column actions"
       >
@@ -286,7 +283,7 @@ export function DataGridHeader() {
   const isColVirtualized = features?.virtualization?.enabled ?? false
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
   )
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -309,8 +306,7 @@ export function DataGridHeader() {
     table.setColumnOrder(newOrder)
   }
 
-  const leafHeaders =
-    headerGroups[headerGroups.length - 1]?.headers ?? []
+  const leafHeaders = headerGroups[headerGroups.length - 1]?.headers ?? []
   const columnIds = leafHeaders.map((h) => h.column.id)
 
   // Column virtualization helpers
@@ -322,7 +318,7 @@ export function DataGridHeader() {
     ? new Set(
         (virtualCols ?? [])
           .map((vc) => centerCols[vc.index]?.id)
-          .filter(Boolean),
+          .filter(Boolean)
       )
     : null
   const totalColVirtualSize = columnVirtualizer.getTotalSize()
@@ -346,52 +342,51 @@ export function DataGridHeader() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <thead>
+      <TableHeader>
         {headerGroups.map((headerGroup, groupIndex) => {
           const isGroupRow =
             headerGroups.length > 1 && groupIndex < headerGroups.length - 1
 
           if (isGroupRow) {
             return (
-              <tr
+              <TableRow
                 key={headerGroup.id}
-                className="bg-muted/40 border-b border-border"
+                className="border-b border-border bg-muted/40"
               >
                 {headerGroup.headers.map((header) => (
-                  <th
+                  <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
                     style={{ width: `${header.getSize()}px` }}
-                    className="bg-muted/40 border-b border-border px-[var(--cell-px)] h-[var(--header-height)]"
+                    className="h-(--header-height) border-b border-border bg-muted/40 px-(--cell-px)"
                   >
                     {!header.isPlaceholder && (
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground text-center block">
+                      <span className="block text-center text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                         {flexRender(
                           header.column.columnDef.header,
-                          header.getContext(),
+                          header.getContext()
                         )}
                       </span>
                     )}
-                  </th>
+                  </TableHead>
                 ))}
-              </tr>
+              </TableRow>
             )
           }
 
           // Split leaf headers for column virtualization
           const leftHeaders = headerGroup.headers.filter(
-            (h) => h.column.getIsPinned() === "left",
+            (h) => h.column.getIsPinned() === "left"
           )
           const centerHeaders = headerGroup.headers.filter(
-            (h) => !h.column.getIsPinned(),
+            (h) => !h.column.getIsPinned()
           )
           const rightHeaders = headerGroup.headers.filter(
-            (h) => h.column.getIsPinned() === "right",
+            (h) => h.column.getIsPinned() === "right"
           )
-          const visibleCenterHeaders =
-            centerColIdSet
-              ? centerHeaders.filter((h) => centerColIdSet.has(h.column.id))
-              : centerHeaders
+          const visibleCenterHeaders = centerColIdSet
+            ? centerHeaders.filter((h) => centerColIdSet.has(h.column.id))
+            : centerHeaders
 
           // Leaf row — sortable
           return (
@@ -400,7 +395,7 @@ export function DataGridHeader() {
               items={columnIds}
               strategy={horizontalListSortingStrategy}
             >
-              <tr>
+              <TableRow>
                 {/* Always-visible left-pinned headers */}
                 {leftHeaders.map((header) => (
                   <SortableHeaderCell
@@ -412,7 +407,7 @@ export function DataGridHeader() {
 
                 {/* Start spacer for column virtualization */}
                 {isColVirtualized && startPad > 0 && (
-                  <th style={{ width: startPad, padding: 0 }} />
+                  <TableHead style={{ width: startPad, padding: 0 }} />
                 )}
 
                 {/* Visible center headers */}
@@ -426,7 +421,7 @@ export function DataGridHeader() {
 
                 {/* End spacer for column virtualization */}
                 {isColVirtualized && endPad > 0 && (
-                  <th style={{ width: endPad, padding: 0 }} />
+                  <TableHead style={{ width: endPad, padding: 0 }} />
                 )}
 
                 {/* Always-visible right-pinned headers */}
@@ -437,14 +432,14 @@ export function DataGridHeader() {
                     isResizing={isResizing}
                   />
                 ))}
-              </tr>
+              </TableRow>
             </SortableContext>
           )
         })}
 
         {/* Optional filter row */}
         {features?.filtering?.filterRow && <FilterRow />}
-      </thead>
+      </TableHeader>
     </DndContext>
   )
 }
