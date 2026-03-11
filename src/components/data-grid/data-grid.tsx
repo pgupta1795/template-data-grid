@@ -1,5 +1,6 @@
 import React, { memo } from "react"
 import type { Row } from "@tanstack/react-table"
+import type { QueryKey } from "@tanstack/react-query"
 import type {
   GridRow,
   GridDensity,
@@ -8,6 +9,10 @@ import type {
 } from "@/types/grid-types"
 import type { GridColumnDef } from "@/types/column-types"
 import type { GridSlots } from "@/types/slot-types"
+import type {
+  PaginatedQueryFn,
+  InfiniteQueryFn,
+} from "@/hooks/use-data-grid"
 import { useDataGrid } from "@/hooks/use-data-grid"
 import { DataGridProvider, useDataGridContext } from "./data-grid-context"
 import { DataGridHeader } from "./data-grid-header"
@@ -257,7 +262,9 @@ function DataGridInner() {
 }
 
 export interface DataGridProps<TData extends GridRow> {
-  data: TData[]
+  data?: TData[]
+  queryKey?: QueryKey
+  queryFn?: PaginatedQueryFn<TData> | InfiniteQueryFn<TData>
   columns: GridColumnDef<TData>[]
   mode?: GridMode
   density?: GridDensity

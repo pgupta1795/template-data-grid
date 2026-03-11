@@ -40,6 +40,15 @@ export interface DataGridContextValue {
   commitEditing: (value: unknown) => Promise<void>
   mutatingRowIds: Set<string>
   errorRowIds: Set<string>
+  // Pagination
+  pagination: { pageIndex: number; pageSize: number }
+  setPagination: React.Dispatch<
+    React.SetStateAction<{ pageIndex: number; pageSize: number }>
+  >
+  paginatedTotal: number | undefined
+  // Infinite
+  hasNextPage: boolean
+  fetchNextPage: () => void
 }
 
 export const DataGridContext =

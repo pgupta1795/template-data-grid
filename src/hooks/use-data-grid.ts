@@ -10,7 +10,9 @@ import {
   getGroupedRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import type { Table, FilterFnOption } from "@tanstack/react-table"
+import type { QueryKey } from "@tanstack/react-query"
 import type {
   GridRow,
   GridDensity,
@@ -20,6 +22,8 @@ import type {
 import type { GridSlots } from "@/types/slot-types"
 import type { GridColumnDef, ColumnType } from "@/types/column-types"
 import type { DataGridContextValue } from "@/components/data-grid/data-grid-context"
+import type { SortState } from "@/types/sort-types"
+import type { FilterState } from "@/types/filter-types"
 import { useSorting } from "@/features/sorting/use-sorting"
 import { useFiltering } from "@/features/filtering/use-filtering"
 import { useColumnResize } from "./use-column-resize"
@@ -38,9 +42,26 @@ import {
 } from "@/features/virtualization/use-virtualization"
 import { useEditing } from "@/features/editing/use-editing"
 import { useLoadingState } from "@/features/loading/use-loading-state"
+import {
+  useInfiniteData,
+  type InfinitePageResult,
+} from "@/hooks/use-infinite-data"
+
+export type PaginatedQueryFn<TData> = (params: {
+  pageIndex: number
+  pageSize: number
+  sort: SortState[]
+  filters: FilterState[]
+}) => Promise<{ rows: TData[]; total: number }>
+
+export type InfiniteQueryFn<TData> = (params: {
+  pageParam: number
+  sort: SortState[]
+  filters: FilterState[]
+}) => Promise<InfinitePageResult<TData>>
 
 export interface DataGridConfig<TData extends GridRow> {
-  data: TData[]
+  data?: TData[]
   columns: GridColumnDef<TData>[]
   mode?: GridMode
   density?: GridDensity
@@ -52,13 +73,15 @@ export interface DataGridConfig<TData extends GridRow> {
   isRefetching?: boolean
   isFetchingNextPage?: boolean
   onRefresh?: () => void
+  // Query-driven modes
+  queryKey?: QueryKey
+  queryFn?: PaginatedQueryFn<TData> | InfiniteQueryFn<TData>
 }
 
 export function useDataGrid<TData extends GridRow>(
   config: DataGridConfig<TData>,
 ): DataGridContextValue {
   const {
-    data,
     columns,
     density: initialDensity = "normal",
     features,
@@ -74,21 +97,70 @@ export function useDataGrid<TData extends GridRow>(
     React.useState<Record<string, boolean>>({})
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
-  // Internal data state — allows lazy tree expand to merge children
-  const [internalData, setInternalData] = React.useState<TData[]>(data)
-  React.useEffect(() => {
-    setInternalData(data as TData[])
-  }, [data])
+  // Pagination state (for paginated mode)
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 50,
+  })
+
+  const isServerMode = mode === "paginated" || mode === "infinite"
 
   // Feature hooks
-  const sortingHook = useSorting(features?.sorting)
-  const filteringHook = useFiltering(features?.filtering)
+  const sortingHook = useSorting({
+    ...features?.sorting,
+    mode: isServerMode ? "server" : (features?.sorting?.mode ?? "client"),
+  })
+  const filteringHook = useFiltering({
+    ...features?.filtering,
+    mode: isServerMode ? "server" : (features?.filtering?.mode ?? "client"),
+  })
   const resizeHook = useColumnResize()
   const selectionHook = useSelection(features?.selection)
   const columnPinningHook = useColumnPinning(features?.columnPinning)
   const rowPinningHook = useRowPinning(features?.rowPinning)
   const groupingHook = useGrouping(features?.grouping)
   const orderingHook = useColumnOrdering()
+
+  // Convert TanStack Table sorting/filtering state to SortState[]/FilterState[]
+  const sortState: SortState[] = sortingHook.sortingState.map((s) => ({
+    columnId: s.id,
+    direction: s.desc ? ("desc" as const) : ("asc" as const),
+  }))
+  const filterState: FilterState[] = filteringHook.columnFilters.map((f) => ({
+    columnId: f.id,
+    value: f.value,
+  }))
+
+  // Paginated query (always called, enabled only when mode === 'paginated')
+  const paginatedQuery = useQuery({
+    queryKey: [
+      ...(config.queryKey ?? []),
+      {
+        page: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        sort: sortState,
+        filters: filterState,
+      },
+    ],
+    queryFn: () =>
+      (config.queryFn as PaginatedQueryFn<TData>)({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        sort: sortState,
+        filters: filterState,
+      }),
+    enabled: mode === "paginated" && !!config.queryKey,
+    placeholderData: keepPreviousData,
+  })
+
+  // Infinite query (always called, enabled only when mode === 'infinite')
+  const infiniteQuery = useInfiniteData<TData>({
+    queryKey: config.queryKey ?? [],
+    queryFn: config.queryFn as InfiniteQueryFn<TData>,
+    sortState,
+    filterState,
+    enabled: mode === "infinite" && !!config.queryKey,
+  })
 
   // Editing
   const editingHook = useEditing(features?.editing)
@@ -100,6 +172,28 @@ export function useDataGrid<TData extends GridRow>(
     isFetchingNextPage: externalIsFetchingNextPage,
     isMutating: editingHook.mutatingRowIds.size > 0,
   })
+
+  // Determine effective data source based on mode
+  const effectiveData = React.useMemo<TData[]>(() => {
+    if (mode === "paginated")
+      return (paginatedQuery.data?.rows ?? []) as TData[]
+    if (mode === "infinite") return infiniteQuery.rows as TData[]
+    return (config.data ?? []) as TData[]
+  }, [mode, paginatedQuery.data, infiniteQuery.rows, config.data])
+
+  // Internal data state — allows lazy tree expand to merge children
+  const [internalData, setInternalData] =
+    React.useState<TData[]>(effectiveData)
+  React.useEffect(() => {
+    setInternalData(effectiveData)
+  }, [effectiveData])
+
+  // Reset page to 0 on sort/filter change (paginated mode)
+  React.useEffect(() => {
+    if (mode === "paginated") {
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+    }
+  }, [sortingHook.sortingState, filteringHook.columnFilters, mode])
 
   // Lazy tree expand
   const { loadingRowIds, handleExpand } = useLazyExpand({
@@ -201,6 +295,14 @@ export function useDataGrid<TData extends GridRow>(
           autoResetExpanded: false,
         }
       : {}),
+    // Paginated mode: manual pagination with server-driven row count
+    ...(mode === "paginated"
+      ? {
+          manualPagination: true,
+          rowCount: paginatedQuery.data?.total ?? -1,
+          onPaginationChange: setPagination,
+        }
+      : {}),
     state: {
       sorting: sortingHook.sortingState,
       columnFilters: filteringHook.columnFilters,
@@ -212,6 +314,7 @@ export function useDataGrid<TData extends GridRow>(
       grouping: groupingHook.grouping,
       expanded: groupingHook.expanded,
       columnOrder: orderingHook.columnOrder,
+      ...(mode === "paginated" ? { pagination } : {}),
     },
     onColumnVisibilityChange: setColumnVisibility,
     // Sorting
@@ -272,11 +375,22 @@ export function useDataGrid<TData extends GridRow>(
     containerRef: tableContainerRef,
   })
 
+  // Determine effective isLoading based on mode
+  const isLoading =
+    mode === "paginated"
+      ? paginatedQuery.isLoading
+      : mode === "infinite"
+        ? infiniteQuery.isLoading
+        : loadingState.isInitialLoading
+
   return {
     table: table as unknown as Table<GridRow>,
-    isLoading: loadingState.isInitialLoading,
+    isLoading,
     isRefetching: loadingState.isRefetching,
-    isFetchingNextPage: loadingState.isFetchingNextPage,
+    isFetchingNextPage:
+      mode === "infinite"
+        ? infiniteQuery.isFetchingNextPage
+        : loadingState.isFetchingNextPage,
     density,
     setDensity,
     globalFilter: filteringHook.globalFilter,
@@ -286,7 +400,9 @@ export function useDataGrid<TData extends GridRow>(
     mode,
     slots,
     onRefresh,
-    handleExpand: handleExpand as (row: import("@tanstack/react-table").Row<GridRow>) => Promise<void>,
+    handleExpand: handleExpand as (
+      row: import("@tanstack/react-table").Row<GridRow>,
+    ) => Promise<void>,
     loadingRowIds,
     rowVirtualizer,
     columnVirtualizer,
@@ -296,5 +412,12 @@ export function useDataGrid<TData extends GridRow>(
     commitEditing: editingHook.commitEditing,
     mutatingRowIds: editingHook.mutatingRowIds,
     errorRowIds: editingHook.errorRowIds,
+    // Pagination
+    pagination,
+    setPagination,
+    paginatedTotal: paginatedQuery.data?.total,
+    // Infinite
+    hasNextPage: infiniteQuery.hasNextPage,
+    fetchNextPage: infiniteQuery.fetchNextPage,
   }
 }
