@@ -121,8 +121,9 @@ interface ColumnConfig {
   // Data binding from secondary sources
   dataSource?: string                   // id of a DataSourceConfig
   joinOn?: {
-    rowField: string                    // field on the primary row
-    sourceField: string                 // field on secondary source record
+    rowField: string                    // FK field on the primary row (e.g. "supplierId")
+    sourceKey: string                   // PK field on the source record to match against (e.g. "id")
+    sourceField: string                 // value field on the matched source record to display (e.g. "name")
   }
 
   // Derived value — evaluated by the engine during data resolution (before TanStack Table renders)
@@ -433,7 +434,7 @@ const bomConfig: TableConfig = {
       header: "Supplier",
       type: "string",
       dataSource: "suppliers",
-      joinOn: { rowField: "supplierId", sourceField: "id" },
+      joinOn: { rowField: "supplierId", sourceKey: "id", sourceField: "name" },
       filterable: true,
       editable: false,
     },
