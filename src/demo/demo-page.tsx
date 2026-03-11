@@ -16,8 +16,8 @@ import {
 import type { GridColumnDef } from "../types/column-types"
 import type { GridRow } from "../types/grid-types"
 
-// Flat mode — 200 rows (no virtualization needed for demo)
-const flatData = generateMockBomData(200)
+// Flat mode — 10k rows, fully virtualized
+const flatData = generateMockBomData(10000)
 
 // Tree mode — root nodes only (children fetched lazily)
 const treeRootData = generateMockRootNodes(50)

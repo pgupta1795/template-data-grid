@@ -163,14 +163,22 @@ function applyFilters(rows: GridRow[], filters: FilterState[]): GridRow[] {
       const cell = row[columnId]
       if (value == null || value === '') return true
       if (Array.isArray(value)) {
-        // multi-value / select filter
-        return (
-          value.length === 0 ||
-          value.some(
-            (v) =>
-              String(cell).toLowerCase() === String(v).toLowerCase(),
-          )
-        )
+        // Number range: [min, max]
+        if (value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+          const num = Number(cell)
+          return !isNaN(num) && num >= value[0] && num <= value[1]
+        }
+        // Multi-value / select: equality set membership
+        return value.length === 0 || value.some(v => String(cell).toLowerCase() === String(v).toLowerCase())
+      }
+      if (typeof value === 'object' && value !== null && ('from' in value || 'to' in value)) {
+        // Date range filter: { from?: string, to?: string }
+        const dateFilter = value as { from?: string; to?: string }
+        const cellDate = cell instanceof Date ? cell : new Date(String(cell ?? ''))
+        if (isNaN(cellDate.getTime())) return true // can't parse, don't filter out
+        if (dateFilter.from && cellDate < new Date(dateFilter.from)) return false
+        if (dateFilter.to && cellDate > new Date(dateFilter.to)) return false
+        return true
       }
       if (typeof value === 'object' && 'value' in value) {
         // string/code filter: { value, operator }
