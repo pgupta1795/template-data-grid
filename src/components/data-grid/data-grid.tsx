@@ -260,28 +260,30 @@ function DataGridInner() {
         <DataGridToolbar />
       )}
 
-      <Table
-        containerRef={tableContainerRef}
-        containerClassName="overflow-auto rounded-md border border-border"
-        className="border-collapse text-sm"
-        style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
-      >
-        {isLoading ? (
-          <DataGridSkeleton
-            columns={visibleColumns}
-            skeletonRows={skeletonRows}
-            showHeaderSkeleton
-          />
-        ) : (
-          <>
-            <DataGridHeader />
-            <TableBody>
-              <DataGridBody />
-            </TableBody>
-          </>
-        )}
-      </Table>
-      {mode === "paginated" && <DataGridPagination />}
+      <div className="rounded-md border border-border overflow-hidden">
+        <Table
+          containerRef={tableContainerRef}
+          containerClassName="overflow-auto"
+          className="border-collapse text-sm"
+          style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
+        >
+          {isLoading ? (
+            <DataGridSkeleton
+              columns={visibleColumns}
+              skeletonRows={skeletonRows}
+              showHeaderSkeleton
+            />
+          ) : (
+            <>
+              <DataGridHeader />
+              <TableBody>
+                <DataGridBody />
+              </TableBody>
+            </>
+          )}
+        </Table>
+        {mode === "paginated" && <DataGridPagination />}
+      </div>
     </>
   )
 }
