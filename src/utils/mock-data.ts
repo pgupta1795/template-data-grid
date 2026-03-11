@@ -1,4 +1,6 @@
 import type { GridRow } from '../types/grid-types'
+import type { SortState } from '../types/sort-types'
+import type { FilterState } from '../types/filter-types'
 
 const STATUS_OPTIONS = ['active', 'draft', 'obsolete', 'review'] as const
 const ALL_TAGS = ['mechanical', 'electrical', 'software', 'fastener', 'assembly', 'raw-material']
@@ -121,4 +123,101 @@ export function simulateMutation<T>(value: T, delay = 600): Promise<T> {
       }
     }, delay)
   })
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+// 10k rows pre-generated once for stable "server" simulation
+const ALL_MOCK_DATA: GridRow[] = Array.from({ length: 10000 }, (_, i) =>
+  generateRow(i),
+)
+
+function applySort(rows: GridRow[], sort: SortState[]): GridRow[] {
+  if (sort.length === 0) return rows
+  return [...rows].sort((a, b) => {
+    for (const { columnId, direction } of sort) {
+      const av = a[columnId]
+      const bv = b[columnId]
+      if (av == null && bv == null) continue
+      if (av == null) return 1
+      if (bv == null) return -1
+      let cmp = 0
+      if (typeof av === 'number' && typeof bv === 'number') {
+        cmp = av - bv
+      } else if (av instanceof Date && bv instanceof Date) {
+        cmp = av.getTime() - bv.getTime()
+      } else {
+        cmp = String(av).localeCompare(String(bv))
+      }
+      if (cmp !== 0) return direction === 'asc' ? cmp : -cmp
+    }
+    return 0
+  })
+}
+
+function applyFilters(rows: GridRow[], filters: FilterState[]): GridRow[] {
+  return rows.filter((row) =>
+    filters.every(({ columnId, value }) => {
+      const cell = row[columnId]
+      if (value == null || value === '') return true
+      if (Array.isArray(value)) {
+        // multi-value / select filter
+        return (
+          value.length === 0 ||
+          value.some(
+            (v) =>
+              String(cell).toLowerCase() === String(v).toLowerCase(),
+          )
+        )
+      }
+      if (typeof value === 'object' && 'value' in value) {
+        // string/code filter: { value, operator }
+        const { value: str, operator } = value as {
+          value: string
+          operator: string
+        }
+        const cellStr = String(cell ?? '').toLowerCase()
+        const searchStr = str.toLowerCase()
+        if (operator === 'startsWith') return cellStr.startsWith(searchStr)
+        return cellStr.includes(searchStr) // 'contains' or default
+      }
+      return String(cell ?? '')
+        .toLowerCase()
+        .includes(String(value).toLowerCase())
+    }),
+  )
+}
+
+export async function fetchBomPage(params: {
+  pageIndex: number
+  pageSize: number
+  sort: SortState[]
+  filters: FilterState[]
+}): Promise<{ rows: GridRow[]; total: number }> {
+  await delay(400 + Math.random() * 300)
+  let rows = [...ALL_MOCK_DATA]
+  if (params.filters.length > 0) rows = applyFilters(rows, params.filters)
+  if (params.sort.length > 0) rows = applySort(rows, params.sort)
+  const total = rows.length
+  const start = params.pageIndex * params.pageSize
+  return { rows: rows.slice(start, start + params.pageSize), total }
+}
+
+export async function fetchBomInfinitePage(params: {
+  pageParam: number
+  sort: SortState[]
+  filters: FilterState[]
+}): Promise<{ rows: GridRow[]; nextPage: number | null; total: number }> {
+  await delay(300 + Math.random() * 200)
+  const PAGE_SIZE = 50
+  let rows = [...ALL_MOCK_DATA]
+  if (params.filters.length > 0) rows = applyFilters(rows, params.filters)
+  if (params.sort.length > 0) rows = applySort(rows, params.sort)
+  const start = params.pageParam * PAGE_SIZE
+  const pageRows = rows.slice(start, start + PAGE_SIZE)
+  const nextPage =
+    start + PAGE_SIZE < rows.length ? params.pageParam + 1 : null
+  return { rows: pageRows, nextPage, total: rows.length }
 }
