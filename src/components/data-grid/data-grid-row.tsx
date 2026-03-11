@@ -11,10 +11,11 @@ interface DataGridRowProps {
   row: Row<GridRow>
   pinned?: "top" | "bottom"
   className?: string
+  initialIndex?: number
 }
 
 export const DataGridRow = memo(
-  function DataGridRow({ row, pinned, className }: DataGridRowProps) {
+  function DataGridRow({ row, pinned, className, initialIndex }: DataGridRowProps) {
     const { mode, features, table, columnVirtualizer, mutatingRowIds, errorRowIds } =
       useDataGridContext()
 
@@ -49,7 +50,13 @@ export const DataGridRow = memo(
     const rowStyle: React.CSSProperties = {
       ...depthStyle,
       ...pinnedStyle,
+      ...(initialIndex !== undefined && initialIndex < 20
+        ? { animationDelay: `${initialIndex * 20}ms` }
+        : {}),
     }
+
+    const rowRevealClass =
+      initialIndex !== undefined && initialIndex < 20 ? "row-reveal" : undefined
 
     // With column virtualization, split cells into pinned + center
     if (isColVirtualized) {
@@ -93,6 +100,7 @@ export const DataGridRow = memo(
             pinned && "bg-muted/60 shadow-sm",
             isMutating && "opacity-70 pointer-events-none",
             isError && "animate-[flash-error_0.4s_ease]",
+            rowRevealClass,
             className,
           )}
           data-selected={String(row.getIsSelected())}
@@ -126,6 +134,7 @@ export const DataGridRow = memo(
           "data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary",
           "transition-colors duration-100",
           pinned && "bg-muted/60 shadow-sm",
+          rowRevealClass,
           className,
         )}
         data-selected={String(row.getIsSelected())}

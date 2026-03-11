@@ -132,3 +132,16 @@
   0%, 100% { background-color: transparent; }
   50% { background-color: oklch(var(--destructive) / 0.12); }
 }
+
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.row-reveal {
+  animation: row-in 0.15s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-reveal { animation: none; }
+}

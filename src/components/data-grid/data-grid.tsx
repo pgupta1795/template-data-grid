@@ -184,12 +184,15 @@ function DataGridBody() {
       )}
 
       {/* Center rows */}
-      {renderedCenterRows.map((row) => {
+      {renderedCenterRows.map((row, renderIdx) => {
         if (!row) return null
         const isLoading = loadingRowIds.has(row.id)
         return (
           <React.Fragment key={row.id}>
-            <DataGridRow row={row as Row<GridRow>} />
+            <DataGridRow
+              row={row as Row<GridRow>}
+              initialIndex={renderIdx}
+            />
             {/* Show skeleton children while lazy-fetching */}
             {isTreeMode && isLoading && (
               <TreeSkeletonRows depth={row.depth} colCount={colCount} />
@@ -276,7 +279,7 @@ function DataGridInner() {
           ) : (
             <>
               <DataGridHeader />
-              <TableBody>
+              <TableBody className="animate-in fade-in duration-200">
                 <DataGridBody />
               </TableBody>
             </>
