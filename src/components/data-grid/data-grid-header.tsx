@@ -280,9 +280,10 @@ function HeaderActionMenu({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function DataGridHeader() {
-  const { table, features } = useDataGridContext()
+  const { table, features, columnVirtualizer } = useDataGridContext()
   const headerGroups = table.getHeaderGroups()
   const isResizing = !!table.getState().columnSizingInfo?.isResizingColumn
+  const isColVirtualized = features?.virtualization?.enabled ?? false
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -311,6 +312,33 @@ export function DataGridHeader() {
   const leafHeaders =
     headerGroups[headerGroups.length - 1]?.headers ?? []
   const columnIds = leafHeaders.map((h) => h.column.id)
+
+  // Column virtualization helpers
+  const virtualCols = isColVirtualized
+    ? columnVirtualizer.getVirtualItems()
+    : null
+  const centerCols = table.getCenterLeafColumns()
+  const centerColIdSet = isColVirtualized
+    ? new Set(
+        (virtualCols ?? [])
+          .map((vc) => centerCols[vc.index]?.id)
+          .filter(Boolean),
+      )
+    : null
+  const totalColVirtualSize = columnVirtualizer.getTotalSize()
+  const startPad =
+    virtualCols && virtualCols.length > 0
+      ? centerCols
+          .slice(0, virtualCols[0]?.index ?? 0)
+          .reduce((s, c) => s + c.getSize(), 0)
+      : 0
+  const endPad =
+    virtualCols && virtualCols.length > 0
+      ? totalColVirtualSize -
+        centerCols
+          .slice(0, (virtualCols[virtualCols.length - 1]?.index ?? 0) + 1)
+          .reduce((s, c) => s + c.getSize(), 0)
+      : 0
 
   return (
     <DndContext
@@ -350,6 +378,21 @@ export function DataGridHeader() {
             )
           }
 
+          // Split leaf headers for column virtualization
+          const leftHeaders = headerGroup.headers.filter(
+            (h) => h.column.getIsPinned() === "left",
+          )
+          const centerHeaders = headerGroup.headers.filter(
+            (h) => !h.column.getIsPinned(),
+          )
+          const rightHeaders = headerGroup.headers.filter(
+            (h) => h.column.getIsPinned() === "right",
+          )
+          const visibleCenterHeaders =
+            centerColIdSet
+              ? centerHeaders.filter((h) => centerColIdSet.has(h.column.id))
+              : centerHeaders
+
           // Leaf row — sortable
           return (
             <SortableContext
@@ -358,7 +401,36 @@ export function DataGridHeader() {
               strategy={horizontalListSortingStrategy}
             >
               <tr>
-                {headerGroup.headers.map((header) => (
+                {/* Always-visible left-pinned headers */}
+                {leftHeaders.map((header) => (
+                  <SortableHeaderCell
+                    key={header.id}
+                    header={header as Header<GridRow, unknown>}
+                    isResizing={isResizing}
+                  />
+                ))}
+
+                {/* Start spacer for column virtualization */}
+                {isColVirtualized && startPad > 0 && (
+                  <th style={{ width: startPad, padding: 0 }} />
+                )}
+
+                {/* Visible center headers */}
+                {visibleCenterHeaders.map((header) => (
+                  <SortableHeaderCell
+                    key={header.id}
+                    header={header as Header<GridRow, unknown>}
+                    isResizing={isResizing}
+                  />
+                ))}
+
+                {/* End spacer for column virtualization */}
+                {isColVirtualized && endPad > 0 && (
+                  <th style={{ width: endPad, padding: 0 }} />
+                )}
+
+                {/* Always-visible right-pinned headers */}
+                {rightHeaders.map((header) => (
                   <SortableHeaderCell
                     key={header.id}
                     header={header as Header<GridRow, unknown>}

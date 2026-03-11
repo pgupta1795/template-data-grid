@@ -82,6 +82,35 @@ export function generateMockBomData(count: number): GridRow[] {
   })
 }
 
+/** Generate only root-level nodes (no children pre-loaded) for lazy tree demo */
+export function generateMockRootNodes(count: number): GridRow[] {
+  return Array.from({ length: count }, (_, i) => {
+    const row = generateRow(i)
+    // Signal that children CAN be fetched (lazy), but don't pre-load them
+    row._hasChildren = true
+    row.children = []
+    return row
+  })
+}
+
+/** Simulate async child fetch for lazy tree demo */
+export function generateMockChildren(
+  parentId: string,
+  count: number,
+): GridRow[] {
+  const seed = parentId.split("").reduce((a, c) => a + c.charCodeAt(0), 0)
+  return Array.from({ length: count }, (_, i) => {
+    const row = generateRow(seed * 100 + i + 1, 1)
+    row.id = `${parentId}-child-${i}`
+    // ~30% of children also have lazy children
+    if (i % 3 === 0) {
+      row._hasChildren = true
+      row.children = []
+    }
+    return row
+  })
+}
+
 export function simulateMutation<T>(value: T, delay = 600): Promise<T> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {

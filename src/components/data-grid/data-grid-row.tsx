@@ -1,49 +1,141 @@
-import type { Row } from '@tanstack/react-table'
-import type { GridRow } from '@/types/grid-types'
-import { DataGridCell } from './data-grid-cell'
-import { GroupRow } from '@/features/grouping/group-row'
-import { cn } from '@/lib/utils'
+import React, { memo } from "react"
+import type { Row } from "@tanstack/react-table"
+import type { GridRow } from "@/types/grid-types"
+import { DataGridCell } from "./data-grid-cell"
+import { GroupRow } from "@/features/grouping/group-row"
+import { useDataGridContext } from "./data-grid-context"
+import { cn } from "@/lib/utils"
 
 interface DataGridRowProps {
   row: Row<GridRow>
-  virtualRow?: { start: number }
-  pinned?: 'top' | 'bottom'
+  pinned?: "top" | "bottom"
   className?: string
 }
 
-export function DataGridRow({ row, virtualRow, pinned, className }: DataGridRowProps) {
-  // Render group rows differently
-  if (row.getIsGrouped()) {
-    return <GroupRow row={row} />
-  }
+export const DataGridRow = memo(
+  function DataGridRow({ row, pinned, className }: DataGridRowProps) {
+    const { mode, features, table, columnVirtualizer } =
+      useDataGridContext()
 
-  const pinnedStyle: React.CSSProperties | undefined = pinned
-    ? {
-        position: 'sticky',
-        top: pinned === 'top' ? 'var(--header-height)' : undefined,
-        bottom: pinned === 'bottom' ? 0 : undefined,
-        zIndex: 2,
-      }
-    : virtualRow
-      ? { transform: `translateY(${virtualRow.start}px)` }
+    // Render group rows differently
+    if (row.getIsGrouped()) {
+      return <GroupRow row={row} />
+    }
+
+    const isTreeMode = mode === "tree"
+    const isColVirtualized = features?.virtualization?.enabled ?? false
+
+    // Tree depth tinting — subtle left border per depth level
+    const depthStyle: React.CSSProperties =
+      isTreeMode && row.depth > 0
+        ? {
+            borderLeft: `2px solid`,
+            borderLeftColor: `hsl(var(--primary) / ${Math.min(row.depth * 0.12 + 0.08, 0.55)})`,
+          }
+        : {}
+
+    const pinnedStyle: React.CSSProperties | undefined = pinned
+      ? {
+          position: "sticky",
+          top: pinned === "top" ? "var(--header-height)" : undefined,
+          bottom: pinned === "bottom" ? 0 : undefined,
+          zIndex: 2,
+        }
       : undefined
 
-  return (
-    <tr
-      className={cn(
-        'group/row bg-background hover:bg-muted/30',
-        'data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary',
-        'transition-colors duration-100',
-        pinned && 'bg-muted/60 shadow-sm',
-        className
-      )}
-      data-selected={String(row.getIsSelected())}
-      data-pinned={pinned}
-      style={pinnedStyle}
-    >
-      {row.getVisibleCells().map(cell => (
-        <DataGridCell key={cell.id} cell={cell} />
-      ))}
-    </tr>
-  )
-}
+    const rowStyle: React.CSSProperties = {
+      ...depthStyle,
+      ...pinnedStyle,
+    }
+
+    // With column virtualization, split cells into pinned + center
+    if (isColVirtualized) {
+      const leftCells = row.getLeftVisibleCells()
+      const centerCells = row.getCenterVisibleCells()
+      const rightCells = row.getRightVisibleCells()
+
+      const virtualCols = columnVirtualizer.getVirtualItems()
+      const totalColSize = columnVirtualizer.getTotalSize()
+      const centerCols = table.getCenterLeafColumns()
+
+      const startPad =
+        virtualCols.length > 0 && centerCols.length > 0
+          ? centerCols
+              .slice(0, virtualCols[0]?.index ?? 0)
+              .reduce((s, c) => s + c.getSize(), 0)
+          : 0
+      const endPad =
+        virtualCols.length > 0 && centerCols.length > 0
+          ? totalColSize -
+            (virtualCols[virtualCols.length - 1]
+              ? centerCols
+                  .slice(0, (virtualCols[virtualCols.length - 1]?.index ?? 0) + 1)
+                  .reduce((s, c) => s + c.getSize(), 0)
+              : 0)
+          : 0
+
+      const virtualCenterCellIds = new Set(
+        virtualCols.map((vc) => centerCols[vc.index]?.id).filter(Boolean),
+      )
+      const visibleCenterCells = centerCells.filter((cell) =>
+        virtualCenterCellIds.has(cell.column.id),
+      )
+
+      return (
+        <tr
+          className={cn(
+            "group/row bg-background hover:bg-muted/30",
+            "data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary",
+            "transition-colors duration-100",
+            pinned && "bg-muted/60 shadow-sm",
+            className,
+          )}
+          data-selected={String(row.getIsSelected())}
+          data-pinned={pinned}
+          style={rowStyle}
+        >
+          {leftCells.map((cell) => (
+            <DataGridCell key={cell.id} cell={cell} />
+          ))}
+          {startPad > 0 && (
+            <td style={{ width: startPad, padding: 0 }} />
+          )}
+          {visibleCenterCells.map((cell) => (
+            <DataGridCell key={cell.id} cell={cell} />
+          ))}
+          {endPad > 0 && (
+            <td style={{ width: endPad, padding: 0 }} />
+          )}
+          {rightCells.map((cell) => (
+            <DataGridCell key={cell.id} cell={cell} />
+          ))}
+        </tr>
+      )
+    }
+
+    // Non-virtualized path
+    return (
+      <tr
+        className={cn(
+          "group/row bg-background hover:bg-muted/30",
+          "data-[selected=true]:bg-primary/6 data-[selected=true]:border-l-2 data-[selected=true]:border-l-primary",
+          "transition-colors duration-100",
+          pinned && "bg-muted/60 shadow-sm",
+          className,
+        )}
+        data-selected={String(row.getIsSelected())}
+        data-pinned={pinned}
+        style={rowStyle}
+      >
+        {row.getVisibleCells().map((cell) => (
+          <DataGridCell key={cell.id} cell={cell} />
+        ))}
+      </tr>
+    )
+  },
+  (prev, next) =>
+    prev.row.id === next.row.id &&
+    prev.row.getIsExpanded() === next.row.getIsExpanded() &&
+    prev.row.getIsSelected() === next.row.getIsSelected() &&
+    prev.pinned === next.pinned,
+)

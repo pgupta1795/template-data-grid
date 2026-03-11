@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import type { Cell } from '@tanstack/react-table'
 import { Calendar, Check, Copy, X } from 'lucide-react'
 import type { GridRow } from '@/types/grid-types'
@@ -185,11 +185,25 @@ export interface DataGridCellProps {
   className?: string
 }
 
-export function DataGridCell({ cell, className }: DataGridCellProps) {
-  const { table } = useDataGridContext()
+function DataGridCellInner({ cell, className }: DataGridCellProps) {
+  const { table, mode } = useDataGridContext()
   const { column, row } = cell
   const meta = column.columnDef.meta as ColumnMeta | undefined
   const value = cell.getValue()
+
+  // In tree mode, add depth indentation to the first non-special data column
+  const isTreeMode = mode === "tree"
+  const firstDataColId = isTreeMode
+    ? table
+        .getVisibleLeafColumns()
+        .find(
+          (c) => c.id !== "__expand__" && c.id !== "__select__",
+        )?.id
+    : undefined
+  const isFirstDataColumn = isTreeMode && column.id === firstDataColId
+  const extraPaddingLeft = isFirstDataColumn
+    ? `${row.depth * 20}px`
+    : undefined
 
   // Pinned column sticky styles
   const isPinned = column.getIsPinned()
@@ -205,12 +219,17 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
     : {}
   const shadowClass = getPinnedShadowClass(column, leftCols, rightCols)
 
+  const cellStyle: React.CSSProperties = {
+    ...pinnedStyle,
+    ...(extraPaddingLeft ? { paddingLeft: extraPaddingLeft } : {}),
+  }
+
   // 1. Custom render function takes priority
   if (typeof meta?.render === 'function') {
     const rendered = (meta.render as (value: unknown, row: GridRow) => React.ReactNode)(value, row.original)
     return (
       <td
-        style={pinnedStyle}
+        style={cellStyle}
         className={cn(
           'px-[var(--cell-px)] py-[var(--cell-py)]',
           'border-r border-border/30 last:border-r-0',
@@ -271,7 +290,7 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
 
   return (
     <td
-      style={pinnedStyle}
+      style={cellStyle}
       className={cn(
         'px-[var(--cell-px)] py-[var(--cell-py)]',
         'border-r border-border/30 last:border-r-0',
@@ -290,3 +309,10 @@ export function DataGridCell({ cell, className }: DataGridCellProps) {
     </td>
   )
 }
+
+export const DataGridCell = memo(DataGridCellInner, (prev, next) => {
+  return (
+    prev.cell.getValue() === next.cell.getValue() &&
+    prev.className === next.className
+  )
+})
