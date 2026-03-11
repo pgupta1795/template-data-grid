@@ -198,8 +198,8 @@ function SortableHeaderCell({
       {/* Resize handle */}
       <div
         className={cn(
-          "absolute top-0 right-0 h-full w-1 cursor-col-resize transition-colors",
-          column.getIsResizing() ? "w-[3px] bg-primary" : "hover:bg-primary/40"
+          "absolute top-0 right-0 h-full w-1 cursor-col-resize transition-[width,background-color] duration-100",
+          column.getIsResizing() ? "w-[3px] bg-primary" : "hover:bg-primary/40 hover:w-[3px]"
         )}
         onMouseDown={header.getResizeHandler()}
         onTouchStart={header.getResizeHandler()}

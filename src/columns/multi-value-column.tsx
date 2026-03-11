@@ -13,6 +13,20 @@ interface MultiValueColumnOptions {
   [key: string]: unknown
 }
 
+/**
+ * Creates a column definition for rendering an array of strings as badges.
+ *
+ * @param options.accessorKey - The key of the data field to display
+ * @param options.header - Column header label
+ * @param options.editable - Enable double-click inline editing (default: false)
+ * @param options.options - Optional predefined select options if editing as a multi-select
+ * @param options.maxVisible - Maximum number of badges to display before truncating (default: 3)
+ * @param options.width - Base width in pixels (default: 240)
+ * @param options.meta - Extra column metadata injected into react-table
+ *
+ * @example
+ * multiValueColumn({ accessorKey: 'tags', header: 'Tags', maxVisible: 2 })
+ */
 export function multiValueColumn(options: MultiValueColumnOptions): GridColumnDef {
   const { accessorKey, header, editable, options: selectOptions, maxVisible = 3, width, meta: extraMeta, ...rest } = options
 

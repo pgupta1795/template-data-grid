@@ -19,6 +19,19 @@ const DEFAULT_COLORS: Record<string, string> = {
   review: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
 }
 
+/**
+ * Creates a column definition for categorical data with a badge representation.
+ *
+ * @param options.accessorKey - The key of the data field to display
+ * @param options.header - Column header label
+ * @param options.editable - Enable double-click inline editing (default: false)
+ * @param options.options - Array of available SelectOption objects for display and editing
+ * @param options.width - Base width in pixels (default: 140)
+ * @param options.meta - Extra column metadata injected into react-table
+ *
+ * @example
+ * selectColumn({ accessorKey: 'status', header: 'Status', options: [{ value: 'active', label: 'Active' }] })
+ */
 export function selectColumn(options: SelectColumnOptions): GridColumnDef {
   const { accessorKey, header, editable, options: selectOptions, width, meta: extraMeta, ...rest } = options
 

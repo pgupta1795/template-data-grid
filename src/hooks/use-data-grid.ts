@@ -1,51 +1,51 @@
-import React from "react"
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFacetedMinMaxValues,
-  getGroupedRowModel,
-  getExpandedRowModel,
-} from "@tanstack/react-table"
-import { useQuery, keepPreviousData } from "@tanstack/react-query"
-import type { Table, FilterFnOption } from "@tanstack/react-table"
-import type { QueryKey } from "@tanstack/react-query"
-import type {
-  GridRow,
-  GridDensity,
-  GridMode,
-  GridFeaturesConfig,
-} from "@/types/grid-types"
-import type { GridSlots } from "@/types/slot-types"
-import type { GridColumnDef, ColumnType } from "@/types/column-types"
 import type { DataGridContextValue } from "@/components/data-grid/data-grid-context"
-import type { SortState } from "@/types/sort-types"
-import type { FilterState } from "@/types/filter-types"
-import { useSorting } from "@/features/sorting/use-sorting"
-import { useFiltering } from "@/features/filtering/use-filtering"
-import { useColumnResize } from "./use-column-resize"
+import { useEditing } from "@/features/editing/use-editing"
 import { filterFnForType } from "@/features/filtering/filter-functions"
-import { useSelection } from "@/features/selection/use-selection"
-import { selectionColumnDef } from "@/features/selection/selection-cell"
+import { useFiltering } from "@/features/filtering/use-filtering"
+import { useGrouping } from "@/features/grouping/use-grouping"
+import { useLoadingState } from "@/features/loading/use-loading-state"
+import { useColumnOrdering } from "@/features/ordering/use-column-ordering"
 import { useColumnPinning } from "@/features/pinning/use-column-pinning"
 import { useRowPinning } from "@/features/pinning/use-row-pinning"
-import { useGrouping } from "@/features/grouping/use-grouping"
-import { useColumnOrdering } from "@/features/ordering/use-column-ordering"
-import { useLazyExpand } from "@/features/tree/use-lazy-expand"
+import { selectionColumnDef } from "@/features/selection/selection-cell"
+import { useSelection } from "@/features/selection/use-selection"
+import { useSorting } from "@/features/sorting/use-sorting"
 import { expandColumnDef } from "@/features/tree/expand-toggle"
+import { useLazyExpand } from "@/features/tree/use-lazy-expand"
 import {
-  useRowVirtualizer,
   useColVirtualizer,
+  useRowVirtualizer,
 } from "@/features/virtualization/use-virtualization"
-import { useEditing } from "@/features/editing/use-editing"
-import { useLoadingState } from "@/features/loading/use-loading-state"
 import {
   useInfiniteData,
   type InfinitePageResult,
 } from "@/hooks/use-infinite-data"
+import type { ColumnType, GridColumnDef } from "@/types/column-types"
+import type { FilterState } from "@/types/filter-types"
+import type {
+  GridDensity,
+  GridFeaturesConfig,
+  GridMode,
+  GridRow,
+} from "@/types/grid-types"
+import type { GridSlots } from "@/types/slot-types"
+import type { SortState } from "@/types/sort-types"
+import type { QueryKey } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import type { FilterFnOption, Table } from "@tanstack/react-table"
+import {
+  getCoreRowModel,
+  getExpandedRowModel,
+  getFacetedMinMaxValues,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getGroupedRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import React from "react"
+import { useColumnResize } from "./use-column-resize"
 
 export type PaginatedQueryFn<TData> = (params: {
   pageIndex: number
@@ -60,26 +60,61 @@ export type InfiniteQueryFn<TData> = (params: {
   filters: FilterState[]
 }) => Promise<InfinitePageResult<TData>>
 
+/**
+ * Configuration for the useDataGrid hook.
+ * Shared mostly with DataGridProps, but tailored for internal hook usage.
+ */
 export interface DataGridConfig<TData extends GridRow> {
+  /** Array of rows for client-side modes (flat and tree) */
   data?: TData[]
+  /** Array of column configurations */
   columns: GridColumnDef<TData>[]
+  /** Operation mode of the grid. 'flat', 'tree', 'paginated', or 'infinite' */
   mode?: GridMode
+  /** Visual density spacing */
   density?: GridDensity
+  /** Settings for interactive grid features (sorting, filtering, editing, etc.) */
   features?: GridFeaturesConfig
+  /** Render overrides for specific wrapper sections of the grid */
   slots?: GridSlots
+  /** Function to extract nested children arrays for Tree mode */
   getSubRows?: (row: TData) => TData[] | undefined
+  /** Async callback fired when expanding a node in Tree mode */
   onExpand?: (row: GridRow) => Promise<GridRow[]> | void
-  // External loading signals (e.g. from TanStack Query)
+  /** Indicates if remote data is currently refetching */
   isRefetching?: boolean
+  /** Indicates if an infinite scroll query is fetching the next page */
   isFetchingNextPage?: boolean
+  /** Action handler for the toolbar refresh button */
   onRefresh?: () => void
-  // Query-driven modes
+  /** Required QueryKey for query-driven modes (paginated, infinite) */
   queryKey?: QueryKey
+  /** Data fetching query function for server modes */
   queryFn?: PaginatedQueryFn<TData> | InfiniteQueryFn<TData>
 }
 
+/**
+ * Headless hook that manages state and orchestration for TanStack Table wrapped with internal features.
+ * Integrates directly with sorting, filtering, row selection, pinning, grouping, editing, and virtualization hooks.
+ * config:
+ *  - data: Array of rows for client-side modes (flat and tree)
+ *  - columns: Array of column configurations
+ *  - mode: Operation mode of the grid. 'flat', 'tree', 'paginated', or 'infinite'
+ *  - density: Visual density spacing
+ *  - features: Settings for interactive grid features (sorting, filtering, editing, etc.)
+ *  - slots: Render overrides for specific wrapper sections of the grid
+ *  - getSubRows: Function to extract nested children arrays for Tree mode
+ *  - onExpand: Async callback fired when expanding a node in Tree mode
+ *  - isRefetching: Indicates if remote data is currently refetching
+ *  - isFetchingNextPage: Indicates if an infinite scroll query is fetching the next page
+ *  - onRefresh: Action handler for the toolbar refresh button
+ *  - queryKey: Required QueryKey for query-driven modes (paginated, infinite)
+ *  - queryFn: Data fetching query function for server modes
+ * @param config DataGrid parameters and configuration flags
+ * @returns An aggregated state context object ready to be provided to grid UI components via DataGridProvider
+ */
 export function useDataGrid<TData extends GridRow>(
-  config: DataGridConfig<TData>,
+  config: DataGridConfig<TData>
 ): DataGridContextValue {
   const {
     columns,
@@ -93,8 +128,9 @@ export function useDataGrid<TData extends GridRow>(
   } = config
 
   const [density, setDensity] = React.useState<GridDensity>(initialDensity)
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<Record<string, boolean>>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<
+    Record<string, boolean>
+  >({})
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
   // Pagination state (for paginated mode)
@@ -128,7 +164,7 @@ export function useDataGrid<TData extends GridRow>(
         columnId: s.id,
         direction: s.desc ? ("desc" as const) : ("asc" as const),
       })),
-    [sortingHook.sortingState],
+    [sortingHook.sortingState]
   )
   const filterState = React.useMemo<FilterState[]>(
     () =>
@@ -136,7 +172,7 @@ export function useDataGrid<TData extends GridRow>(
         columnId: f.id,
         value: f.value,
       })),
-    [filteringHook.columnFilters],
+    [filteringHook.columnFilters]
   )
 
   // Paginated query (always called, enabled only when mode === 'paginated')
@@ -190,8 +226,7 @@ export function useDataGrid<TData extends GridRow>(
   }, [mode, paginatedQuery.data, infiniteQuery.rows, config.data])
 
   // Internal data state — allows lazy tree expand to merge children
-  const [internalData, setInternalData] =
-    React.useState<TData[]>(effectiveData)
+  const [internalData, setInternalData] = React.useState<TData[]>(effectiveData)
   React.useEffect(() => {
     setInternalData(effectiveData)
   }, [effectiveData])
@@ -206,9 +241,7 @@ export function useDataGrid<TData extends GridRow>(
   // Lazy tree expand
   const { loadingRowIds, handleExpand } = useLazyExpand({
     onExpand: config.onExpand,
-    setData: setInternalData as React.Dispatch<
-      React.SetStateAction<GridRow[]>
-    >,
+    setData: setInternalData as React.Dispatch<React.SetStateAction<GridRow[]>>,
   })
 
   // Post-process columns: add filterFn + aggregationFn per column type
@@ -223,7 +256,7 @@ export function useDataGrid<TData extends GridRow>(
           ...(type === "number" ? { aggregationFn: "sum" as const } : {}),
         }
       }),
-    [columns],
+    [columns]
   )
 
   // Inject special columns
@@ -277,6 +310,7 @@ export function useDataGrid<TData extends GridRow>(
     ...orderingHook.tableOptions,
   }
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable<TData>({
     data: internalData,
     columns: finalColumns,
@@ -359,9 +393,7 @@ export function useDataGrid<TData extends GridRow>(
 
   // Row virtualization — count center rows for flat, all visible rows for tree
   const rowsForVirtualizer =
-    mode === "tree"
-      ? table.getRowModel().rows
-      : table.getCenterRows()
+    mode === "tree" ? table.getRowModel().rows : table.getCenterRows()
   const rowVirtualizer = useRowVirtualizer({
     enabled: features?.virtualization?.enabled ?? false,
     rowCount: rowsForVirtualizer.length,
@@ -406,7 +438,7 @@ export function useDataGrid<TData extends GridRow>(
       slots,
       onRefresh,
       handleExpand: handleExpand as (
-        row: import("@tanstack/react-table").Row<GridRow>,
+        row: import("@tanstack/react-table").Row<GridRow>
       ) => Promise<void>,
       loadingRowIds,
       rowVirtualizer,
@@ -455,6 +487,6 @@ export function useDataGrid<TData extends GridRow>(
       pagination,
       setPagination,
       paginatedQuery.data?.total,
-    ],
+    ]
   )
 }

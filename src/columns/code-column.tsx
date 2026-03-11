@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { GridColumnDef, ColumnMeta } from '../types/column-types'
 import { Copy, Check } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip'
@@ -37,6 +38,21 @@ function CodeCopyButton({ value }: { value: string }) {
   )
 }
 
+/**
+ * Creates a column definition for displaying source code snippets.
+ *
+ * @param options.accessorKey - The key of the data field to display
+ * @param options.header - Column header label
+ * @param options.editable - Enable double-click inline editing (default: false)
+ * @param options.language - Programming language for syntax highlighting (default: 'text')
+ * @param options.copyable - Show a copy button (default: true)
+ * @param options.maxLines - Max lines to show before truncating into a tooltip (default: 1)
+ * @param options.width - Base width in pixels (default: 220)
+ * @param options.meta - Extra column metadata injected into react-table
+ *
+ * @example
+ * codeColumn({ accessorKey: 'payload', header: 'Payload', language: 'json' })
+ */
 export function codeColumn(options: CodeColumnOptions): GridColumnDef {
   const {
     accessorKey, header, editable,

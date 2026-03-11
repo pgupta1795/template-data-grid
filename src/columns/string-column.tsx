@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { ColumnMeta, GridColumnDef } from '../types/column-types'
 import { Copy, Check } from 'lucide-react'
 import { useState } from 'react'
@@ -34,6 +35,20 @@ function CopyButton({ value }: { value: string }) {
   )
 }
 
+/**
+ * Creates a string column definition.
+ *
+ * @param options.accessorKey - The key of the data field to display
+ * @param options.header - Column header label
+ * @param options.editable - Enable double-click inline editing (default: false)
+ * @param options.copyable - Show copy button on cell hover (default: false)
+ * @param options.width - Base width in pixels (default: 200)
+ * @param options.minWidth - Minimum width of the column layout (default: 80)
+ * @param options.meta - Extra column metadata injected into react-table
+ *
+ * @example
+ * stringColumn({ accessorKey: 'name', header: 'Name', editable: true, copyable: true })
+ */
 export function stringColumn(options: StringColumnOptions): GridColumnDef {
   const { accessorKey, header, editable, copyable, width, minWidth, meta: extraMeta, ...rest } = options
 

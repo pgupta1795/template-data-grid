@@ -16,6 +16,21 @@ interface BooleanColumnOptions {
   [key: string]: unknown
 }
 
+/**
+ * Creates a column definition for boolean data.
+ *
+ * @param options.accessorKey - The key of the data field to display
+ * @param options.header - Column header label
+ * @param options.editable - Enable double-click inline editing (default: false)
+ * @param options.trueLabel - Label to show when true (default: 'Yes')
+ * @param options.falseLabel - Label to show when false (default: 'No')
+ * @param options.renderAs - Visual style: 'badge', 'checkbox', or 'icon' (default: 'badge')
+ * @param options.width - Base width in pixels (default: 100)
+ * @param options.meta - Extra column metadata injected into react-table
+ *
+ * @example
+ * booleanColumn({ accessorKey: 'isActive', header: 'Active', renderAs: 'icon' })
+ */
 export function booleanColumn(options: BooleanColumnOptions): GridColumnDef {
   const {
     accessorKey, header, editable,

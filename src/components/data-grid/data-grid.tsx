@@ -291,24 +291,44 @@ function DataGridInner() {
   )
 }
 
+/**
+ * Configuration props for the DataGrid component.
+ */
 export interface DataGridProps<TData extends GridRow> {
+  /** The data to display in the grid (for flat and tree modes). */
   data?: TData[]
+  /** React Query key array for paginated and infinite modes. */
   queryKey?: QueryKey
+  /** The fetch function for paginated and infinite modes. */
   queryFn?: PaginatedQueryFn<TData> | InfiniteQueryFn<TData>
+  /** Array of column definitions created via column factories. */
   columns: GridColumnDef<TData>[]
+  /** Operational mode of the grid. Defaults to 'flat'. */
   mode?: GridMode
+  /** Density spacing for rows and cells. Defaults to 'normal'. */
   density?: GridDensity
+  /** Configuration for features like sorting, filtering, grouping, editing, virtualization, etc. */
   features?: GridFeaturesConfig
+  /** Custom render slots for grid sections like toolbar and pagination. */
   slots?: GridSlots
+  /** Additional CSS classes for the root container. */
   className?: string
+  /** Used in tree mode to resolve children nodes from a given row. */
   getSubRows?: (row: TData) => TData[] | undefined
+  /** Triggered when an Expandable row requests to load children lazily. */
   onExpand?: (row: GridRow) => Promise<GridRow[]> | void
-  // External loading signals (e.g. from TanStack Query)
+  /** Indicates if external data is currently refetching. */
   isRefetching?: boolean
+  /** Indicates if infinite scroll is currently fetching the next page. */
   isFetchingNextPage?: boolean
+  /** Callback fired when the user clicks the refresh button. */
   onRefresh?: () => void
 }
 
+/**
+ * A highly capable data grid built on top of TanStack Table.
+ * Supports Flat, Paginated, Infinite, and Tree modes with full virtualization and editing.
+ */
 export function DataGrid<TData extends GridRow>(props: DataGridProps<TData>) {
   const grid = useDataGrid(props)
   const densityVars = DENSITY_VARS[grid.density]
