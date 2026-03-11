@@ -7,7 +7,11 @@ function SelectAllCheckbox({ table }: { table: Table<GridRow> }) {
   const isSome = table.getIsSomeRowsSelected()
 
   return (
-    <div className="flex items-center justify-center">
+    <div
+      className="flex items-center justify-center"
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <Checkbox
         checked={isAll}
         indeterminate={isSome && !isAll}
@@ -21,12 +25,14 @@ function SelectAllCheckbox({ table }: { table: Table<GridRow> }) {
 
 function SelectRowCheckbox({ row }: { row: Row<GridRow> }) {
   return (
-    <div className="flex items-center justify-center">
+    <div
+      className="flex items-center justify-center"
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <Checkbox
         checked={row.getIsSelected()}
-        disabled={!row.getCanSelect()}
         onCheckedChange={(v) => row.toggleSelected(!!v)}
-        onClick={(e) => e.stopPropagation()}
         aria-label="Select row"
         className="h-3.5 w-3.5"
       />

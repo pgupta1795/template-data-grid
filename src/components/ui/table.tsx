@@ -1,23 +1,12 @@
-"use client"
-
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Table({
-  className,
-  containerRef,
-  containerClassName,
-  ...props
-}: React.ComponentProps<"table"> & {
-  containerRef?: React.Ref<HTMLDivElement>
-  containerClassName?: string
-}) {
+function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
-      ref={containerRef}
       data-slot="table-container"
-      className={cn("relative w-full overflow-x-auto", containerClassName)}
+      className="relative w-full overflow-x-auto"
     >
       <table
         data-slot="table"

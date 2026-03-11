@@ -16,10 +16,12 @@ export function ExpandToggle({ row }: { row: Row<GridRow> }) {
     <button
       onClick={async (e) => {
         e.stopPropagation()
-        if (!row.getIsExpanded()) {
+        const nextExpanded = !row.getIsExpanded()
+        row.toggleExpanded(nextExpanded)
+
+        if (nextExpanded) {
           await handleExpand(row)
         }
-        row.getToggleExpandedHandler()()
       }}
       style={{ paddingLeft: `${row.depth * 20}px` }}
       aria-label={row.getIsExpanded() ? "Collapse row" : "Expand row"}

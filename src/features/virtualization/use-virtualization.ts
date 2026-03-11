@@ -37,7 +37,7 @@ export function useRowVirtualizer(
     count: config.enabled ? config.rowCount : 0,
     getScrollElement: () => config.containerRef.current,
     estimateSize: () => rowHeight,
-    overscan: config.overscan ?? 5,
+    overscan: Math.max(config.overscan ?? 5, 12),
   })
 }
 

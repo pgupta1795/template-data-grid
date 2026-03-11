@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import type { ColumnMeta } from "@/types/column-types"
 import type { GridRow } from "@/types/grid-types"
 import { formatDate, formatNumber } from "@/utils/formatters"
-import type { Cell } from "@tanstack/react-table"
+import { flexRender, type Cell } from "@tanstack/react-table"
 import { Calendar, Check, Copy, X } from "lucide-react"
 import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 import { useDataGridContext } from "./data-grid-context"
@@ -471,6 +471,28 @@ function DataGridCellInner({ cell, className }: DataGridCellProps) {
   }
 
   // 2. Type-based rendering
+  if (column.columnDef.cell) {
+    return (
+      <TableCell
+        ref={tdRef}
+        tabIndex={-1}
+        style={cellStyle}
+        className={cn(
+          baseCellClasses,
+          "px-(--cell-px) py-(--cell-py)",
+          isEditable && "cursor-text",
+          "focus:ring-1 focus:ring-primary/40 focus:outline-none focus:ring-inset"
+        )}
+        onDoubleClick={() => {
+          if (isEditable) startEditing(row.id, column.id, value)
+        }}
+        onKeyDown={handleCellKeyDown}
+      >
+        {flexRender(column.columnDef.cell, cell.getContext())}
+      </TableCell>
+    )
+  }
+
   const type = meta?.type
 
   let content: React.ReactNode
@@ -535,6 +557,13 @@ function DataGridCellInner({ cell, className }: DataGridCellProps) {
 }
 
 export const DataGridCell = memo(DataGridCellInner, (prev, next) => {
+  if (
+    prev.cell.column.id === "__select__" ||
+    next.cell.column.id === "__select__"
+  ) {
+    return false
+  }
+
   return (
     prev.cell.getValue() === next.cell.getValue() &&
     prev.className === next.className

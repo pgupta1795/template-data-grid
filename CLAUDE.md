@@ -11,8 +11,8 @@
 
 ## Implementation Status
 
-- **Implemented**: Phase 1 (Foundation) and Phase 2 (Core Rendering / Flat Mode).
-- **Pending**: Phases 3-9.
+- **Implemented**: Phase 1 -9 as per docs/superpowers/plans/.
+- **Pending**: None.
 - When contributing, align changes to the current phase plan files (e.g., `docs/superpowers/plans/xxx.md`) and avoid introducing out-of-phase behavior.
 
 ## Coding Style & Naming Conventions

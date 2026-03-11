@@ -487,6 +487,10 @@ export function useDataGrid<TData extends GridRow>(
       pagination,
       setPagination,
       paginatedQuery.data?.total,
+      orderingHook.columnOrder,
+      columnPinningHook.columnPinning,
+      groupingHook.grouping,
+      groupingHook.expanded,
     ]
   )
 }

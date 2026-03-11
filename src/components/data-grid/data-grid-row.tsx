@@ -1,4 +1,4 @@
-import React, { memo } from "react"
+import React from "react"
 import type { Row } from "@tanstack/react-table"
 import type { GridRow } from "@/types/grid-types"
 import { DataGridCell } from "./data-grid-cell"
@@ -14,10 +14,14 @@ interface DataGridRowProps {
   initialIndex?: number
 }
 
-export const DataGridRow = memo(
-  function DataGridRow({ row, pinned, className, initialIndex }: DataGridRowProps) {
-    const { mode, features, table, columnVirtualizer, mutatingRowIds, errorRowIds } =
-      useDataGridContext()
+export function DataGridRow({
+  row,
+  pinned,
+  className,
+  initialIndex,
+}: DataGridRowProps) {
+  const { mode, features, table, columnVirtualizer, mutatingRowIds, errorRowIds } =
+    useDataGridContext()
 
     // Render group rows differently
     if (row.getIsGrouped()) {
@@ -146,10 +150,4 @@ export const DataGridRow = memo(
         ))}
       </ShadcnTableRow>
     )
-  },
-  (prev, next) =>
-    prev.row.id === next.row.id &&
-    prev.row.getIsExpanded() === next.row.getIsExpanded() &&
-    prev.row.getIsSelected() === next.row.getIsSelected() &&
-    prev.pinned === next.pinned,
-)
+}

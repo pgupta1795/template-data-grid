@@ -1,34 +1,34 @@
-import React, { memo } from "react"
-import type { Row } from "@tanstack/react-table"
-import type { QueryKey } from "@tanstack/react-query"
-import type {
-  GridRow,
-  GridDensity,
-  GridMode,
-  GridFeaturesConfig,
-} from "@/types/grid-types"
-import type { GridColumnDef } from "@/types/column-types"
-import type { GridSlots } from "@/types/slot-types"
-import type {
-  PaginatedQueryFn,
-  InfiniteQueryFn,
-} from "@/hooks/use-data-grid"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import type { InfiniteQueryFn, PaginatedQueryFn } from "@/hooks/use-data-grid"
 import { useDataGrid } from "@/hooks/use-data-grid"
-import { DataGridProvider, useDataGridContext } from "./data-grid-context"
-import { DataGridHeader } from "./data-grid-header"
-import { DataGridRow } from "./data-grid-row"
-import { DataGridEmpty } from "./data-grid-empty"
-import { DataGridSkeleton } from "./data-grid-skeleton"
-import { DataGridRowSkeleton } from "./data-grid-row-skeleton"
-import { DataGridToolbar } from "./data-grid-toolbar"
-import { DataGridPagination } from "./data-grid-pagination"
 import { cn } from "@/lib/utils"
+import type { GridSlots } from "@/types"
+import type { GridColumnDef } from "@/types/column-types"
+import type {
+  GridDensity,
+  GridFeaturesConfig,
+  GridMode,
+  GridRow,
+} from "@/types/grid-types"
 import {
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table"
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import type { QueryKey } from "@tanstack/react-query"
+import type { Row } from "@tanstack/react-table"
+import React, { memo } from "react"
+import { DataGridProvider, useDataGridContext } from "./data-grid-context"
+import { DataGridEmpty } from "./data-grid-empty"
+import { DataGridHeader } from "./data-grid-header"
+import { DataGridPagination } from "./data-grid-pagination"
+import { DataGridRow } from "./data-grid-row"
+import { DataGridRowSkeleton } from "./data-grid-row-skeleton"
+import { DataGridSkeleton } from "./data-grid-skeleton"
+import { DataGridToolbar } from "./data-grid-toolbar"
 
 const DENSITY_VARS: Record<GridDensity, Record<string, string>> = {
   compact: {
@@ -65,7 +65,7 @@ const TreeSkeletonRows = memo(function TreeSkeletonRows({
   return (
     <>
       {[0, 1, 2].map((i) => (
-        <TableRow key={i} className="bg-background border-b border-border/50">
+        <TableRow key={i} className="border-b border-border/50 bg-background">
           <TableCell
             colSpan={colCount}
             style={{
@@ -73,7 +73,7 @@ const TreeSkeletonRows = memo(function TreeSkeletonRows({
             }}
           >
             <div
-              className="h-3.5 rounded-sm bg-muted animate-pulse"
+              className="h-3.5 animate-pulse rounded-sm bg-muted"
               style={{ width: `${55 + i * 15}%` }}
             />
           </TableCell>
@@ -138,6 +138,7 @@ function DataGridBody() {
     id: col.id,
     meta: col.columnDef.meta,
   }))
+  const shouldAnimateRows = !isVirtualized
 
   // Determine which rows to render (virtual or all)
   const virtualItems = isVirtualized ? rowVirtualizer.getVirtualItems() : null
@@ -191,7 +192,7 @@ function DataGridBody() {
           <React.Fragment key={row.id}>
             <DataGridRow
               row={row as Row<GridRow>}
-              initialIndex={renderIdx}
+              initialIndex={shouldAnimateRows ? renderIdx : undefined}
             />
             {/* Show skeleton children while lazy-fetching */}
             {isTreeMode && isLoading && (
@@ -222,25 +223,15 @@ function DataGridBody() {
 
       {/* Pinned bottom rows (always rendered, sticky) */}
       {bottomRows.map((row) => (
-        <DataGridRow
-          key={row.id}
-          row={row as Row<GridRow>}
-          pinned="bottom"
-        />
+        <DataGridRow key={row.id} row={row as Row<GridRow>} pinned="bottom" />
       ))}
     </>
   )
 }
 
 function DataGridInner() {
-  const {
-    table,
-    isLoading,
-    features,
-    slots,
-    tableContainerRef,
-    mode,
-  } = useDataGridContext()
+  const { table, isLoading, features, slots, tableContainerRef, mode } =
+    useDataGridContext()
 
   const skeletonRows = features?.loading?.skeletonRows ?? 8
 
@@ -250,44 +241,71 @@ function DataGridInner() {
     meta: col.columnDef.meta,
   }))
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const allCols = table.getAllLeafColumns()
+    const currentOrder =
+      table.getState().columnOrder.length > 0
+        ? table.getState().columnOrder
+        : allCols.map((c) => c.id)
+
+    const fromIdx = currentOrder.indexOf(String(active.id))
+    const toIdx = currentOrder.indexOf(String(over.id))
+    if (fromIdx === -1 || toIdx === -1) return
+
+    const newOrder = [...currentOrder]
+    newOrder.splice(fromIdx, 1)
+    newOrder.splice(toIdx, 0, String(active.id))
+    table.setColumnOrder(newOrder)
+  }
+
   // Compute total table width for column virtualization
   const totalTableWidth = table
     .getVisibleLeafColumns()
     .reduce((sum, col) => sum + col.getSize(), 0)
 
   return (
-    <>
-      {slots?.toolbar ? (
-        slots.toolbar({ table })
-      ) : (
-        <DataGridToolbar />
-      )}
+    <div className="flex min-h-0 flex-1 flex-col">
+      {slots?.toolbar ? slots.toolbar({ table }) : <DataGridToolbar />}
 
-      <div className="rounded-md border border-border overflow-hidden">
-        <Table
-          containerRef={tableContainerRef}
-          containerClassName="overflow-auto"
-          className="border-collapse text-sm"
-          style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
+      <div
+        ref={tableContainerRef}
+        className="relative min-h-0 flex-1 overflow-auto rounded-md border border-border bg-background [&>div]:min-w-full! [&>div]:overflow-visible!"
+      >
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          {isLoading ? (
-            <DataGridSkeleton
-              columns={visibleColumns}
-              skeletonRows={skeletonRows}
-              showHeaderSkeleton
-            />
-          ) : (
-            <>
-              <DataGridHeader />
-              <TableBody className="animate-in fade-in duration-200">
-                <DataGridBody />
-              </TableBody>
-            </>
-          )}
-        </Table>
+          <Table
+            className="border-collapse text-sm"
+            style={{ width: `${totalTableWidth}px`, minWidth: "100%" }}
+          >
+            {isLoading ? (
+              <DataGridSkeleton
+                columns={visibleColumns}
+                skeletonRows={skeletonRows}
+                showHeaderSkeleton
+              />
+            ) : (
+              <>
+                <DataGridHeader />
+                <TableBody className="animate-in duration-200 fade-in">
+                  <DataGridBody />
+                </TableBody>
+              </>
+            )}
+          </Table>
+        </DndContext>
         {mode === "paginated" && <DataGridPagination />}
       </div>
-    </>
+    </div>
   )
 }
 
@@ -337,7 +355,10 @@ export function DataGrid<TData extends GridRow>(props: DataGridProps<TData>) {
     <DataGridProvider value={grid}>
       <div
         data-density={grid.density}
-        className={cn("relative w-full font-sans", props.className)}
+        className={cn(
+          "relative flex h-full w-full flex-col font-sans",
+          props.className
+        )}
         style={densityVars as React.CSSProperties}
       >
         <DataGridInner />

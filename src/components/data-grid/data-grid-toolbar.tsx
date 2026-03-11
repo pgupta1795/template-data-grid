@@ -23,6 +23,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
@@ -145,16 +146,18 @@ const DensityControl = memo(function DensityControl() {
         <AlignJustify className="h-3.5 w-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
-          Density
-        </DropdownMenuLabel>
-        {DENSITIES.map((d) => (
-          <DropdownMenuItem key={d} onClick={() => setDensity(d)}>
-            {density === d && <Check className="h-3.5 w-3.5 mr-2" />}
-            {density !== d && <span className="w-[calc(0.875rem+0.5rem)]" />}
-            <span className="capitalize">{d}</span>
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            Density
+          </DropdownMenuLabel>
+          {DENSITIES.map((d) => (
+            <DropdownMenuItem key={d} onClick={() => setDensity(d)}>
+              {density === d && <Check className="h-3.5 w-3.5 mr-2" />}
+              {density !== d && <span className="w-[calc(0.875rem+0.5rem)]" />}
+              <span className="capitalize">{d}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

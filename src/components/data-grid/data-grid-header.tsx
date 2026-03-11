@@ -14,14 +14,6 @@ import { cn } from "@/lib/utils"
 import type { ColumnType } from "@/types/column-types"
 import type { GridRow } from "@/types/grid-types"
 import {
-  closestCenter,
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core"
-import {
   horizontalListSortingStrategy,
   SortableContext,
   useSortable,
@@ -282,30 +274,6 @@ export function DataGridHeader() {
   const isResizing = !!table.getState().columnSizingInfo?.isResizingColumn
   const isColVirtualized = features?.virtualization?.enabled ?? false
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
-  )
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const allCols = table.getAllLeafColumns()
-    const currentOrder =
-      table.getState().columnOrder.length > 0
-        ? table.getState().columnOrder
-        : allCols.map((c) => c.id)
-
-    const fromIdx = currentOrder.indexOf(String(active.id))
-    const toIdx = currentOrder.indexOf(String(over.id))
-    if (fromIdx === -1 || toIdx === -1) return
-
-    const newOrder = [...currentOrder]
-    newOrder.splice(fromIdx, 1)
-    newOrder.splice(toIdx, 0, String(active.id))
-    table.setColumnOrder(newOrder)
-  }
-
   const leafHeaders = headerGroups[headerGroups.length - 1]?.headers ?? []
   const columnIds = leafHeaders.map((h) => h.column.id)
 
@@ -337,13 +305,8 @@ export function DataGridHeader() {
       : 0
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <TableHeader>
-        {headerGroups.map((headerGroup, groupIndex) => {
+    <TableHeader className="sticky top-0 z-20 bg-background shadow-sm">
+      {headerGroups.map((headerGroup, groupIndex) => {
           const isGroupRow =
             headerGroups.length > 1 && groupIndex < headerGroups.length - 1
 
@@ -440,6 +403,5 @@ export function DataGridHeader() {
         {/* Optional filter row */}
         {features?.filtering?.filterRow && <FilterRow />}
       </TableHeader>
-    </DndContext>
   )
 }
