@@ -21,6 +21,7 @@ import { DataGridEmpty } from "./data-grid-empty"
 import { DataGridSkeleton } from "./data-grid-skeleton"
 import { DataGridRowSkeleton } from "./data-grid-row-skeleton"
 import { DataGridToolbar } from "./data-grid-toolbar"
+import { DataGridPagination } from "./data-grid-pagination"
 import { cn } from "@/lib/utils"
 import {
   Table,
@@ -90,7 +91,30 @@ function DataGridBody() {
     loadingRowIds,
     rowVirtualizer,
     isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    tableContainerRef,
   } = useDataGridContext()
+
+  React.useEffect(() => {
+    if (mode !== "infinite") return
+    const container = tableContainerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+      if (
+        scrollHeight - scrollTop - clientHeight < 300 &&
+        hasNextPage &&
+        !isFetchingNextPage
+      ) {
+        fetchNextPage()
+      }
+    }
+
+    container.addEventListener("scroll", handleScroll)
+    return () => container.removeEventListener("scroll", handleScroll)
+  }, [mode, hasNextPage, isFetchingNextPage, fetchNextPage, tableContainerRef])
 
   const isVirtualized = features?.virtualization?.enabled ?? false
   const isTreeMode = mode === "tree"
@@ -212,6 +236,7 @@ function DataGridInner() {
     features,
     slots,
     tableContainerRef,
+    mode,
   } = useDataGridContext()
 
   const skeletonRows = features?.loading?.skeletonRows ?? 8
@@ -256,7 +281,7 @@ function DataGridInner() {
           </>
         )}
       </Table>
-      {/* pagination placeholder — Phase 8 */}
+      {mode === "paginated" && <DataGridPagination />}
     </>
   )
 }
