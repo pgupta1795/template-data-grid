@@ -138,4 +138,9 @@ export const DataGridRow = memo(
       </ShadcnTableRow>
     )
   },
+  (prev, next) =>
+    prev.row.id === next.row.id &&
+    prev.row.getIsExpanded() === next.row.getIsExpanded() &&
+    prev.row.getIsSelected() === next.row.getIsSelected() &&
+    prev.pinned === next.pinned,
 )

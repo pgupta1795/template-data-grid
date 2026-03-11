@@ -277,13 +277,9 @@ export function useDataGrid<TData extends GridRow>(
     ...orderingHook.tableOptions,
   }
 
-  // Stable references for column and data — define outside component or wrap in useMemo
-  const memoizedColumns = React.useMemo(() => finalColumns, [finalColumns])
-  const memoizedData = React.useMemo(() => internalData, [internalData])
-
   const table = useReactTable<TData>({
-    data: memoizedData,
-    columns: memoizedColumns,
+    data: internalData,
+    columns: finalColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -383,11 +379,6 @@ export function useDataGrid<TData extends GridRow>(
     containerRef: tableContainerRef,
   })
 
-  // Stable fetchNextPage reference
-  const stableFetchNextPage = React.useCallback(() => {
-    infiniteQuery.fetchNextPage()
-  }, [infiniteQuery.fetchNextPage])
-
   // Determine effective isLoading based on mode
   const isLoading =
     mode === "paginated"
@@ -432,7 +423,7 @@ export function useDataGrid<TData extends GridRow>(
       paginatedTotal: paginatedQuery.data?.total,
       // Infinite
       hasNextPage: infiniteQuery.hasNextPage,
-      fetchNextPage: stableFetchNextPage,
+      fetchNextPage: infiniteQuery.fetchNextPage,
     }),
     [
       table,
@@ -442,6 +433,7 @@ export function useDataGrid<TData extends GridRow>(
       mode,
       infiniteQuery.isFetchingNextPage,
       infiniteQuery.hasNextPage,
+      infiniteQuery.fetchNextPage,
       density,
       setDensity,
       filteringHook.globalFilter,
@@ -463,7 +455,6 @@ export function useDataGrid<TData extends GridRow>(
       pagination,
       setPagination,
       paginatedQuery.data?.total,
-      stableFetchNextPage,
     ],
   )
 }
