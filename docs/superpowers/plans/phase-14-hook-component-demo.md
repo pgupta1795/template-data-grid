@@ -19,99 +19,12 @@
 ### Task 1: `src/lib/table-engine/config-validator.ts`
 
 **Files:**
+
 - Create: `src/lib/table-engine/config-validator.ts`
-- Create: `src/lib/table-engine/config-validator.test.ts`
 
 Config validation is extracted into its own file so it can be called once at hook-mount time and also independently tested without needing React.
 
-- [ ] **Step 1: Write failing tests**
-
-Create `src/lib/table-engine/config-validator.test.ts`:
-
-```ts
-import { describe, it, expect } from "vitest"
-import { validateConfig } from "./config-validator"
-import { ConfigError } from "./types"
-import type { TableConfig } from "./types"
-
-const baseConfig: TableConfig = {
-  id: "test",
-  mode: "flat",
-  dataSources: [{ id: "bom", url: "/api/bom" }],
-  columns: [{ field: "name", header: "Name" }],
-}
-
-describe("validateConfig", () => {
-  it("passes for a valid minimal config", () => {
-    expect(() => validateConfig(baseConfig)).not.toThrow()
-  })
-
-  it("throws ConfigError when id is missing", () => {
-    const config = { ...baseConfig, id: "" }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/id/)
-  })
-
-  it("throws ConfigError when dataSources is empty", () => {
-    const config = { ...baseConfig, dataSources: [] }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/dataSources/)
-  })
-
-  it("throws ConfigError when columns is empty", () => {
-    const config = { ...baseConfig, columns: [] }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/columns/)
-  })
-
-  it("throws ConfigError when a column references an unknown dataSource", () => {
-    const config: TableConfig = {
-      ...baseConfig,
-      columns: [
-        { field: "name", header: "Name", dataSource: "nonexistent" },
-      ],
-    }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/nonexistent/)
-  })
-
-  it("throws ConfigError when a rowLevel source has no cacheKey", () => {
-    const config: TableConfig = {
-      ...baseConfig,
-      dataSources: [{ id: "bom", url: "/api/bom", rowLevel: true }],
-    }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/cacheKey/)
-  })
-
-  it("throws ConfigError on circular dependency via buildWaves", () => {
-    const config: TableConfig = {
-      ...baseConfig,
-      dataSources: [
-        { id: "a", url: "/a", dependsOn: ["b"] },
-        { id: "b", url: "/b", dependsOn: ["a"] },
-      ],
-    }
-    expect(() => validateConfig(config)).toThrow(ConfigError)
-    expect(() => validateConfig(config)).toThrow(/circular/i)
-  })
-
-  it("throws ConfigError when mode is 'tree' but no subRowsField and no tree-related source", () => {
-    // This is just a warning scenario — tree mode works without subRowsField
-    // as DataGrid defaults to row.children. Validation should PASS.
-    const config: TableConfig = { ...baseConfig, mode: "tree" }
-    expect(() => validateConfig(config)).not.toThrow()
-  })
-})
-```
-
-- [ ] **Step 2: Run tests — confirm they fail**
-
-```bash
-npx vitest run src/lib/table-engine/config-validator.test.ts
-```
-
-- [ ] **Step 3: Write `src/lib/table-engine/config-validator.ts`**
+- [ ] **Step 1: Write `src/lib/table-engine/config-validator.ts`**
 
 ```ts
 import { buildWaves } from "./dag-resolver"
@@ -166,18 +79,10 @@ export function validateConfig(config: TableConfig): void {
 }
 ```
 
-- [ ] **Step 4: Run tests — confirm they pass**
-
-```bash
-npx vitest run src/lib/table-engine/config-validator.test.ts
-```
-
-Expected: all tests pass.
-
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/lib/table-engine/config-validator.ts src/lib/table-engine/config-validator.test.ts
+git add src/lib/table-engine/config-validator.ts
 git commit -m "feat(table-engine): add config validator with structural and DAG checks"
 ```
 
@@ -188,6 +93,7 @@ git commit -m "feat(table-engine): add config validator with structural and DAG 
 ### Task 2: `src/lib/table-engine/use-table-engine.ts`
 
 **Files:**
+
 - Create: `src/lib/table-engine/use-table-engine.ts`
 
 This is the orchestration layer. It composes all engine modules and integrates with TanStack Query. Integration testing is done via the demo in Task 4 (browser verification).
@@ -549,6 +455,7 @@ git commit -m "feat(table-engine): add useTableEngine orchestration hook"
 ### Task 3: `src/lib/table-engine/configured-table.tsx`
 
 **Files:**
+
 - Create: `src/lib/table-engine/configured-table.tsx`
 
 - [ ] **Step 1: Write `src/lib/table-engine/configured-table.tsx`**
@@ -659,6 +566,7 @@ git commit -m "feat(table-engine): add ConfiguredTable component"
 ### Task 4: BOM Demo with `ConfiguredTable`
 
 **Files:**
+
 - Create: `src/demo/bom-engine-config.ts`
 - Modify: `src/demo/demo-page.tsx` (add a new tab for the engine demo)
 
@@ -1039,22 +947,14 @@ npm run build
 
 Expected: both pass with no errors.
 
-- [ ] **Step 8: Run all tests**
-
-```bash
-npx vitest run
-```
-
-Expected: all engine unit tests pass.
-
-- [ ] **Step 9: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add src/demo/bom-engine-config.ts src/demo/mock-engine-api.ts src/demo/mock-api-interceptor.ts src/demo/demo-page.tsx src/main.tsx
 git commit -m "feat(table-engine): add BOM engine demo with tree mode, derived values, and supplier join"
 ```
 
-- [ ] **Step 10: Final commit for the full engine**
+- [ ] **Step 9: Final commit for the full engine**
 
 ```bash
 git add -A
@@ -1079,5 +979,4 @@ git commit -m "feat: complete table engine — config-driven DataGrid with DAG A
 - [ ] Demo: `internalCode` column hidden by default
 - [ ] Demo: description not editable at root (depth 0), editable at depth ≥ 1
 - [ ] Demo: `partNumber` has no drag handle
-- [ ] `npx vitest run` — all tests pass
 - [ ] `npm run build` — no type errors

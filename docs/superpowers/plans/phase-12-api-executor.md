@@ -6,7 +6,7 @@
 
 **Architecture:** Plain `fetch` — no additional HTTP libraries. Designed as a collection of exported pure/async functions so each concern (URL building, single fetch, row-level batch) is independently testable. The executor is stateless; per-request deduplication is managed by the caller (useTableEngine passes a `Map` keyed on cacheKey).
 
-**Tech Stack:** TypeScript, native `fetch`, `jsonata-evaluator.ts`, Vitest + `vi.stubGlobal` for fetch mocking
+**Tech Stack:** TypeScript, native `fetch`, `jsonata-evaluator.ts`
 
 **Depends on:** Phase 10 (types), Phase 11 (jsonata-evaluator)
 
@@ -19,257 +19,12 @@
 ### Task 1: `src/lib/table-engine/api-executor.ts`
 
 **Files:**
+
 - Create: `src/lib/table-engine/api-executor.ts`
-- Create: `src/lib/table-engine/api-executor.test.ts`
-
-- [ ] **Step 1: Write failing tests first**
-
-Create `src/lib/table-engine/api-executor.test.ts`:
-
-```ts
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import {
-  buildRequestUrl,
-  fetchSource,
-  fetchRowLevelSource,
-} from "./api-executor"
-import type { DataSourceConfig, SourceMap } from "./types"
-
-// ─── buildRequestUrl ──────────────────────────────────────────────────────────
-
-describe("buildRequestUrl", () => {
-  it("returns a plain URL unchanged when no JSONata", async () => {
-    const result = await buildRequestUrl("/api/bom", {})
-    expect(result).toBe("/api/bom")
-  })
-
-  it("evaluates JSONata URL expression with $sources context", async () => {
-    const expr = '"/api/suppliers?ids=" & $join($sources.bom.ids, ",")'
-    const sources: SourceMap = { bom: { ids: ["1", "2", "3"] } }
-    const result = await buildRequestUrl(expr, sources)
-    expect(result).toBe("/api/suppliers?ids=1,2,3")
-  })
-
-  it("appends plain params as query string", async () => {
-    const result = await buildRequestUrl("/api/items", {}, { limit: "10", page: "0" })
-    expect(result).toContain("limit=10")
-    expect(result).toContain("page=0")
-  })
-})
-
-// ─── fetchSource ──────────────────────────────────────────────────────────────
-
-describe("fetchSource", () => {
-  let mockFetch: ReturnType<typeof vi.fn>
-
-  beforeEach(() => {
-    mockFetch = vi.fn()
-    vi.stubGlobal("fetch", mockFetch)
-  })
-
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
-  it("returns parsed JSON data on success", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ items: [1, 2] }),
-    })
-
-    const source: DataSourceConfig = { id: "bom", url: "/api/bom" }
-    const result = await fetchSource(source, {})
-    expect(result).toEqual({ data: { items: [1, 2] }, error: null })
-  })
-
-  it("returns error on non-ok response (no retry for 4xx)", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 404,
-      statusText: "Not Found",
-    })
-
-    const source: DataSourceConfig = { id: "bom", url: "/api/bom" }
-    const result = await fetchSource(source, {})
-    expect(result.data).toBeNull()
-    expect(result.error).toBeInstanceOf(Error)
-    expect(result.error?.message).toContain("404")
-    // Only 1 call — no retry on 4xx
-    expect(mockFetch).toHaveBeenCalledTimes(1)
-  })
-
-  it("retries once on network error by default", async () => {
-    mockFetch
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ items: [] }),
-      })
-
-    const source: DataSourceConfig = { id: "bom", url: "/api/bom" }
-    const result = await fetchSource(source, {})
-    expect(result.error).toBeNull()
-    expect(mockFetch).toHaveBeenCalledTimes(2)
-  })
-
-  it("does NOT retry when retryOnNetworkError is false", async () => {
-    mockFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"))
-
-    const source: DataSourceConfig = {
-      id: "bom",
-      url: "/api/bom",
-      retryOnNetworkError: false,
-    }
-    const result = await fetchSource(source, {})
-    expect(result.error).toBeInstanceOf(Error)
-    expect(mockFetch).toHaveBeenCalledTimes(1)
-  })
-
-  it("returns error after retry also fails", async () => {
-    mockFetch
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
-
-    const source: DataSourceConfig = { id: "bom", url: "/api/bom" }
-    const result = await fetchSource(source, {})
-    expect(result.error).toBeInstanceOf(Error)
-    expect(mockFetch).toHaveBeenCalledTimes(2)
-  })
-
-  it("applies transform JSONata expression to raw response", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ items: [{ id: 1 }, { id: 2 }] }),
-    })
-
-    const source: DataSourceConfig = {
-      id: "bom",
-      url: "/api/bom",
-      transform: "$.items",
-    }
-    const result = await fetchSource(source, {})
-    expect(result.data).toEqual([{ id: 1 }, { id: 2 }])
-  })
-
-  it("sends POST with JSON body", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({}),
-    })
-
-    const source: DataSourceConfig = {
-      id: "bom",
-      url: "/api/bom",
-      method: "POST",
-      body: { filter: "active" },
-    }
-    await fetchSource(source, {})
-    const [, init] = mockFetch.mock.calls[0] as [string, RequestInit]
-    expect(init.method).toBe("POST")
-    expect(JSON.parse(init.body as string)).toEqual({ filter: "active" })
-  })
-
-  it("forwards custom headers", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({}),
-    })
-
-    const source: DataSourceConfig = {
-      id: "bom",
-      url: "/api/bom",
-      headers: { Authorization: "Bearer token123" },
-    }
-    await fetchSource(source, {})
-    const [, init] = mockFetch.mock.calls[0] as [string, RequestInit]
-    expect((init.headers as Record<string, string>)["Authorization"]).toBe("Bearer token123")
-  })
-})
-
-// ─── fetchRowLevelSource ──────────────────────────────────────────────────────
-
-describe("fetchRowLevelSource", () => {
-  let mockFetch: ReturnType<typeof vi.fn>
-
-  beforeEach(() => {
-    mockFetch = vi.fn()
-    vi.stubGlobal("fetch", mockFetch)
-  })
-
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
-  it("deduplicates calls with the same cacheKey", async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ name: "Acme" }),
-    })
-
-    const source: DataSourceConfig = {
-      id: "supplier",
-      url: "/api/suppliers/1",
-      rowLevel: true,
-      cacheKey: "$string(supplierId)",
-    }
-
-    const dedupeMap = new Map<string, Promise<unknown>>()
-    const rows = [
-      { id: "r1", supplierId: "s1" },
-      { id: "r2", supplierId: "s1" }, // same supplierId — should be deduped
-      { id: "r3", supplierId: "s2" },
-    ]
-
-    const results = await Promise.all(
-      rows.map((row) => fetchRowLevelSource(source, row, {}, dedupeMap))
-    )
-
-    // s1 was fetched once, s2 once — total 2 calls not 3
-    expect(mockFetch).toHaveBeenCalledTimes(2)
-    // Both s1 rows got the same result
-    expect(results[0]).toEqual(results[1])
-  })
-
-  it("returns { data: null, error } when fetch fails, without affecting other rows", async () => {
-    mockFetch
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ name: "Globex" }),
-      })
-
-    const source: DataSourceConfig = {
-      id: "supplier",
-      url: "/api/suppliers/1",
-      rowLevel: true,
-      cacheKey: "$string(supplierId)",
-    }
-
-    const dedupeMap = new Map<string, Promise<unknown>>()
-    const rows = [
-      { id: "r1", supplierId: "s1" }, // will fail
-      { id: "r2", supplierId: "s2" }, // will succeed
-    ]
-
-    const results = await Promise.all(
-      rows.map((row) => fetchRowLevelSource(source, row, {}, dedupeMap))
-    )
-
-    expect(results[0]).toMatchObject({ data: null, error: expect.any(Error) })
-    expect(results[1]).toMatchObject({ data: { name: "Globex" }, error: null })
-  })
-})
-```
-
-- [ ] **Step 2: Run tests — confirm they fail**
-
-```bash
-npx vitest run src/lib/table-engine/api-executor.test.ts
-```
 
 Expected: module not found errors.
 
-- [ ] **Step 3: Write `src/lib/table-engine/api-executor.ts`**
+- [ ] **Step : Write `src/lib/table-engine/api-executor.ts`**
 
 ```ts
 import { evaluateRowExpr, evaluateSourceExpr } from "./jsonata-evaluator"
@@ -439,23 +194,9 @@ export async function fetchRowLevelSource(
 }
 ```
 
-- [ ] **Step 4: Run tests — confirm they pass**
-
-```bash
-npx vitest run src/lib/table-engine/api-executor.test.ts
-```
-
-Expected: all tests pass.
-
-- [ ] **Step 5: Run all engine tests**
-
-```bash
-npx vitest run src/lib/table-engine/
-```
-
 Expected: all tests across all engine modules pass.
 
-- [ ] **Step 6: Typecheck**
+- [ ] **Step 2: Typecheck**
 
 ```bash
 npx tsc --noEmit
@@ -463,10 +204,10 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add src/lib/table-engine/api-executor.ts src/lib/table-engine/api-executor.test.ts
+git add src/lib/table-engine/api-executor.ts
 git commit -m "feat(table-engine): add API executor with retry, deduplication, and JSONata URL building"
 ```
 
@@ -485,5 +226,4 @@ git commit -m "feat(table-engine): add API executor with retry, deduplication, a
 - [ ] `fetchSource` forwards custom headers
 - [ ] `fetchRowLevelSource` deduplicates calls with same `cacheKey` via `dedupeMap`
 - [ ] `fetchRowLevelSource` returns `{ data: null, error }` on failure without crashing other rows
-- [ ] All tests pass: `npx vitest run src/lib/table-engine/`
 - [ ] `npx tsc --noEmit` passes
