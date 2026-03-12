@@ -19,26 +19,13 @@ The registry is a declarative manifest of 112 production-ready files organized i
 
 ### Quick Start
 
-1. **Add the Registry to your `components.json`:**
-
-```json
-{
-  "registries": [
-    {
-      "name": "shadcn-ui",
-      "url": "https://raw.githubusercontent.com/pgupta1795/template-data-grid/main/registry/registry.json"
-    }
-  ]
-}
-```
-
-2. **Install Data Grid Components:**
+1. **Install Data Grid Components:**
 
 ```bash
-npx shadcn-ui@latest add https://raw.githubusercontent.com/pgupta1795/template-data-grid/main/registry/registry.json
+npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/template-data-grid/main/registry/data-grid.json
 ```
 
-3. **Use in Your Application:**
+2. **Use in Your Application:**
 
 ```tsx
 import { DataGrid } from '@/components/data-grid'
@@ -67,6 +54,5 @@ export function MyTable() {
 
 For complete installation instructions, configuration details, and advanced usage patterns, see:
 
-- **[Registry Setup & Installation Guide](registry/README.md)**
 - **[Grid Documentation](src/components/data-grid/docs/README.md)**
 - **[Architecture & Design Specs](docs/superpowers/specs/)**
