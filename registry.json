@@ -41,299 +41,373 @@
       ],
       "files": [
         {
-          "path": "data-grid/data-grid.tsx",
+          "path": "src/components/data-grid/data-grid.tsx",
+          "target": "src/components/data-grid/data-grid.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-cell.tsx",
+          "path": "src/components/data-grid/data-grid-cell.tsx",
+          "target": "src/components/data-grid/data-grid-cell.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-context.tsx",
+          "path": "src/components/data-grid/data-grid-context.tsx",
+          "target": "src/components/data-grid/data-grid-context.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-empty.tsx",
+          "path": "src/components/data-grid/data-grid-empty.tsx",
+          "target": "src/components/data-grid/data-grid-empty.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-header.tsx",
+          "path": "src/components/data-grid/data-grid-header.tsx",
+          "target": "src/components/data-grid/data-grid-header.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-pagination.tsx",
+          "path": "src/components/data-grid/data-grid-pagination.tsx",
+          "target": "src/components/data-grid/data-grid-pagination.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-row-skeleton.tsx",
+          "path": "src/components/data-grid/data-grid-row-skeleton.tsx",
+          "target": "src/components/data-grid/data-grid-row-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-row.tsx",
+          "path": "src/components/data-grid/data-grid-row.tsx",
+          "target": "src/components/data-grid/data-grid-row.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-skeleton.tsx",
+          "path": "src/components/data-grid/data-grid-skeleton.tsx",
+          "target": "src/components/data-grid/data-grid-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/data-grid-toolbar.tsx",
+          "path": "src/components/data-grid/data-grid-toolbar.tsx",
+          "target": "src/components/data-grid/data-grid-toolbar.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/index.ts",
+          "path": "src/components/data-grid/index.ts",
+          "target": "src/components/data-grid/index.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/boolean-column.tsx",
+          "path": "src/components/data-grid/columns/boolean-column.tsx",
+          "target": "src/components/data-grid/columns/boolean-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/code-column.tsx",
+          "path": "src/components/data-grid/columns/code-column.tsx",
+          "target": "src/components/data-grid/columns/code-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/date-column.tsx",
+          "path": "src/components/data-grid/columns/date-column.tsx",
+          "target": "src/components/data-grid/columns/date-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/index.ts",
+          "path": "src/components/data-grid/columns/index.ts",
+          "target": "src/components/data-grid/columns/index.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/multi-value-column.tsx",
+          "path": "src/components/data-grid/columns/multi-value-column.tsx",
+          "target": "src/components/data-grid/columns/multi-value-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/number-column.tsx",
+          "path": "src/components/data-grid/columns/number-column.tsx",
+          "target": "src/components/data-grid/columns/number-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/select-column.tsx",
+          "path": "src/components/data-grid/columns/select-column.tsx",
+          "target": "src/components/data-grid/columns/select-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/columns/string-column.tsx",
+          "path": "src/components/data-grid/columns/string-column.tsx",
+          "target": "src/components/data-grid/columns/string-column.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/boolean-editor.tsx",
+          "path": "src/components/data-grid/editors/boolean-editor.tsx",
+          "target": "src/components/data-grid/editors/boolean-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/chip-editor.tsx",
+          "path": "src/components/data-grid/editors/chip-editor.tsx",
+          "target": "src/components/data-grid/editors/chip-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/code-editor.tsx",
+          "path": "src/components/data-grid/editors/code-editor.tsx",
+          "target": "src/components/data-grid/editors/code-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/date-editor.tsx",
+          "path": "src/components/data-grid/editors/date-editor.tsx",
+          "target": "src/components/data-grid/editors/date-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/get-editor.ts",
+          "path": "src/components/data-grid/editors/get-editor.ts",
+          "target": "src/components/data-grid/editors/get-editor.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/index.ts",
+          "path": "src/components/data-grid/editors/index.ts",
+          "target": "src/components/data-grid/editors/index.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/number-editor.tsx",
+          "path": "src/components/data-grid/editors/number-editor.tsx",
+          "target": "src/components/data-grid/editors/number-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/select-editor.tsx",
+          "path": "src/components/data-grid/editors/select-editor.tsx",
+          "target": "src/components/data-grid/editors/select-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/editors/text-editor.tsx",
+          "path": "src/components/data-grid/editors/text-editor.tsx",
+          "target": "src/components/data-grid/editors/text-editor.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/editing/optimistic-update.ts",
+          "path": "src/components/data-grid/features/editing/optimistic-update.ts",
+          "target": "src/components/data-grid/features/editing/optimistic-update.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/editing/use-editing.ts",
+          "path": "src/components/data-grid/features/editing/use-editing.ts",
+          "target": "src/components/data-grid/features/editing/use-editing.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/column-filter-popover.tsx",
+          "path": "src/components/data-grid/features/filtering/column-filter-popover.tsx",
+          "target": "src/components/data-grid/features/filtering/column-filter-popover.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/facet-badge.tsx",
+          "path": "src/components/data-grid/features/filtering/facet-badge.tsx",
+          "target": "src/components/data-grid/features/filtering/facet-badge.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/filter-functions.ts",
+          "path": "src/components/data-grid/features/filtering/filter-functions.ts",
+          "target": "src/components/data-grid/features/filtering/filter-functions.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/filter-row.tsx",
+          "path": "src/components/data-grid/features/filtering/filter-row.tsx",
+          "target": "src/components/data-grid/features/filtering/filter-row.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/fuzzy-filter.ts",
+          "path": "src/components/data-grid/features/filtering/fuzzy-filter.ts",
+          "target": "src/components/data-grid/features/filtering/fuzzy-filter.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/filtering/use-filtering.ts",
+          "path": "src/components/data-grid/features/filtering/use-filtering.ts",
+          "target": "src/components/data-grid/features/filtering/use-filtering.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/grouping/group-row.tsx",
+          "path": "src/components/data-grid/features/grouping/group-row.tsx",
+          "target": "src/components/data-grid/features/grouping/group-row.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/grouping/use-grouping.ts",
+          "path": "src/components/data-grid/features/grouping/use-grouping.ts",
+          "target": "src/components/data-grid/features/grouping/use-grouping.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/loading/skeleton-cell.tsx",
+          "path": "src/components/data-grid/features/loading/skeleton-cell.tsx",
+          "target": "src/components/data-grid/features/loading/skeleton-cell.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/loading/skeleton-header-group.tsx",
+          "path": "src/components/data-grid/features/loading/skeleton-header-group.tsx",
+          "target": "src/components/data-grid/features/loading/skeleton-header-group.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/loading/skeleton-header.tsx",
+          "path": "src/components/data-grid/features/loading/skeleton-header.tsx",
+          "target": "src/components/data-grid/features/loading/skeleton-header.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/loading/use-loading-state.ts",
+          "path": "src/components/data-grid/features/loading/use-loading-state.ts",
+          "target": "src/components/data-grid/features/loading/use-loading-state.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/ordering/use-column-ordering.ts",
+          "path": "src/components/data-grid/features/ordering/use-column-ordering.ts",
+          "target": "src/components/data-grid/features/ordering/use-column-ordering.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/pinning/pinned-shadow.tsx",
+          "path": "src/components/data-grid/features/pinning/pinned-shadow.tsx",
+          "target": "src/components/data-grid/features/pinning/pinned-shadow.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/pinning/use-column-pinning.ts",
+          "path": "src/components/data-grid/features/pinning/use-column-pinning.ts",
+          "target": "src/components/data-grid/features/pinning/use-column-pinning.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/pinning/use-row-pinning.ts",
+          "path": "src/components/data-grid/features/pinning/use-row-pinning.ts",
+          "target": "src/components/data-grid/features/pinning/use-row-pinning.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/selection/selection-cell.tsx",
+          "path": "src/components/data-grid/features/selection/selection-cell.tsx",
+          "target": "src/components/data-grid/features/selection/selection-cell.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/selection/use-selection.ts",
+          "path": "src/components/data-grid/features/selection/use-selection.ts",
+          "target": "src/components/data-grid/features/selection/use-selection.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/sorting/sort-indicator.tsx",
+          "path": "src/components/data-grid/features/sorting/sort-indicator.tsx",
+          "target": "src/components/data-grid/features/sorting/sort-indicator.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/sorting/use-sorting.ts",
+          "path": "src/components/data-grid/features/sorting/use-sorting.ts",
+          "target": "src/components/data-grid/features/sorting/use-sorting.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/tree/expand-toggle.tsx",
+          "path": "src/components/data-grid/features/tree/expand-toggle.tsx",
+          "target": "src/components/data-grid/features/tree/expand-toggle.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/tree/use-lazy-expand.ts",
+          "path": "src/components/data-grid/features/tree/use-lazy-expand.ts",
+          "target": "src/components/data-grid/features/tree/use-lazy-expand.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/features/virtualization/use-virtualization.ts",
+          "path": "src/components/data-grid/features/virtualization/use-virtualization.ts",
+          "target": "src/components/data-grid/features/virtualization/use-virtualization.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/hooks/use-column-resize.ts",
+          "path": "src/components/data-grid/hooks/use-column-resize.ts",
+          "target": "src/components/data-grid/hooks/use-column-resize.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/hooks/use-data-grid.ts",
+          "path": "src/components/data-grid/hooks/use-data-grid.ts",
+          "target": "src/components/data-grid/hooks/use-data-grid.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/hooks/use-infinite-data.ts",
+          "path": "src/components/data-grid/hooks/use-infinite-data.ts",
+          "target": "src/components/data-grid/hooks/use-infinite-data.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/api-executor.ts",
+          "path": "src/components/data-grid/table-engine/api-executor.ts",
+          "target": "src/components/data-grid/table-engine/api-executor.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/column-builder.ts",
+          "path": "src/components/data-grid/table-engine/column-builder.ts",
+          "target": "src/components/data-grid/table-engine/column-builder.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/config-validator.ts",
+          "path": "src/components/data-grid/table-engine/config-validator.ts",
+          "target": "src/components/data-grid/table-engine/config-validator.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/configured-table.tsx",
+          "path": "src/components/data-grid/table-engine/configured-table.tsx",
+          "target": "src/components/data-grid/table-engine/configured-table.tsx",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/dag-resolver.ts",
+          "path": "src/components/data-grid/table-engine/dag-resolver.ts",
+          "target": "src/components/data-grid/table-engine/dag-resolver.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/jsonata-evaluator.ts",
+          "path": "src/components/data-grid/table-engine/jsonata-evaluator.ts",
+          "target": "src/components/data-grid/table-engine/jsonata-evaluator.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/types.ts",
+          "path": "src/components/data-grid/table-engine/types.ts",
+          "target": "src/components/data-grid/table-engine/types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/table-engine/use-table-engine.ts",
+          "path": "src/components/data-grid/table-engine/use-table-engine.ts",
+          "target": "src/components/data-grid/table-engine/use-table-engine.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/column-types.ts",
+          "path": "src/components/data-grid/types/column-types.ts",
+          "target": "src/components/data-grid/types/column-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/editor-types.ts",
+          "path": "src/components/data-grid/types/editor-types.ts",
+          "target": "src/components/data-grid/types/editor-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/filter-types.ts",
+          "path": "src/components/data-grid/types/filter-types.ts",
+          "target": "src/components/data-grid/types/filter-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/grid-types.ts",
+          "path": "src/components/data-grid/types/grid-types.ts",
+          "target": "src/components/data-grid/types/grid-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/index.ts",
+          "path": "src/components/data-grid/types/index.ts",
+          "target": "src/components/data-grid/types/index.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/slot-types.ts",
+          "path": "src/components/data-grid/types/slot-types.ts",
+          "target": "src/components/data-grid/types/slot-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/types/sort-types.ts",
+          "path": "src/components/data-grid/types/sort-types.ts",
+          "target": "src/components/data-grid/types/sort-types.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/utils/csv-export.ts",
+          "path": "src/components/data-grid/utils/csv-export.ts",
+          "target": "src/components/data-grid/utils/csv-export.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/utils/formatters.ts",
+          "path": "src/components/data-grid/utils/formatters.ts",
+          "target": "src/components/data-grid/utils/formatters.ts",
           "type": "registry:component"
         },
         {
-          "path": "data-grid/utils/grid-utils.ts",
+          "path": "src/components/data-grid/utils/grid-utils.ts",
+          "target": "src/components/data-grid/utils/grid-utils.ts",
           "type": "registry:component"
         }
       ]
