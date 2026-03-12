@@ -42,7 +42,7 @@ describe("evaluateRowExpr", () => {
     expect(result).toBe(50)
   })
 
-  it("returns null for undefined row fields", async () => {
+  it("returns undefined for undefined row fields", async () => {
     const result = await evaluateRowExpr("$row.missing", { row: {} })
     expect(result).toBeUndefined()
   })

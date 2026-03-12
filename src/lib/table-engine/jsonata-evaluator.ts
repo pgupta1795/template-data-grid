@@ -57,7 +57,7 @@ export async function evaluateSourceExpr(
  * Available bindings: $row (the current row object).
  * Used for: valueExpr derived column computation.
  *
- * @returns The evaluated result.
+ * @returns The evaluated result, or undefined if expression is empty.
  */
 export async function evaluateRowExpr(
   expression: string,
