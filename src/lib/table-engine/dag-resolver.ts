@@ -28,8 +28,9 @@ function buildGraph(sources: DataSourceConfig[]): {
 } {
   const ids = new Set(sources.map((s) => s.id))
 
-  // Validate all deps reference known ids
+  // Validate all deps reference known ids and contain no duplicates
   for (const source of sources) {
+    const seen = new Set<string>()
     for (const dep of source.dependsOn ?? []) {
       if (!ids.has(dep)) {
         throw new ConfigError(
@@ -42,6 +43,12 @@ function buildGraph(sources: DataSourceConfig[]): {
           `DataSource "${source.id}" has a self-dependency.`
         )
       }
+      if (seen.has(dep)) {
+        throw new ConfigError(
+          `DataSource "${source.id}" has a duplicate dependency on "${dep}".`
+        )
+      }
+      seen.add(dep)
     }
   }
 
@@ -93,7 +100,7 @@ export function buildWaves(sources: DataSourceConfig[]): Wave[] {
       // Nodes remain but none have in-degree 0 — circular dependency
       const cycleNodes = [...remaining]
       throw new ConfigError(
-        `Circular dependency detected among DataSources: ${cycleNodes.join(" → ")}. ` +
+        `Circular dependency detected among DataSources: ${cycleNodes.join(", ")}. ` +
           `Check the dependsOn fields for a cycle.`
       )
     }
