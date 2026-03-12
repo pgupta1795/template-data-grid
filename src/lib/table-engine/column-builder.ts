@@ -8,13 +8,14 @@ import { stringColumn } from "@/columns/string-column"
 import type { GridColumnDef } from "@/types/column-types"
 import type { GridRow } from "@/types/grid-types"
 import { evaluateDepthRule } from "./jsonata-evaluator"
-import type {
-  ColumnBuildResult,
-  ColumnConfig,
-  DepthRule,
-  SourceMap,
-  TableColumnMeta,
-  TableFeaturesConfig,
+import {
+  ConfigError,
+  type ColumnBuildResult,
+  type ColumnConfig,
+  type DepthRule,
+  type SourceMap,
+  type TableColumnMeta,
+  type TableFeaturesConfig,
 } from "./types"
 
 // ─── Factory Registry ─────────────────────────────────────────────────────────
@@ -122,6 +123,7 @@ export function buildColumns<TData extends GridRow>(
       copyable,
       dataSource,
       joinOn,
+      valueExpr: _valueExpr, // pre-populated by engine onto row[field] — no builder action needed
       meta: extraMeta,
       pinned,
     } = colConfig
@@ -159,9 +161,10 @@ export function buildColumns<TData extends GridRow>(
       header,
       editable: resolvedEditable,
       copyable: copyable ?? false,
-      ...(width ? { size: width } : {}),
-      ...(minWidth ? { minSize: minWidth } : {}),
-      ...(maxWidth ? { maxSize: maxWidth } : {}),
+      // Pass width/minWidth/maxWidth as the factories expect (they map to size/minSize internally)
+      ...(width !== undefined ? { width } : {}),
+      ...(minWidth !== undefined ? { minWidth } : {}),
+      ...(maxWidth !== undefined ? { maxWidth } : {}),
       meta,
       ...(type === "select" && extraMeta?.options
         ? { options: extraMeta.options }
@@ -193,6 +196,13 @@ export function buildColumns<TData extends GridRow>(
     // joinOn.sourceKey = PK field on source record used to build the index
     // joinOn.rowField  = FK field on the primary row for lookup
     // joinOn.sourceField = display field on the matched source record
+    if (dataSource && !joinOn) {
+      throw new ConfigError(
+        `Column "${field}" has dataSource "${dataSource}" but no joinOn config. ` +
+        `Provide joinOn: { rowField, sourceKey, sourceField } to define the join.`
+      )
+    }
+
     if (dataSource && joinOn) {
       const rawSourceData = sourceMap[dataSource]
       const joinIndex = buildJoinIndex(rawSourceData, joinOn.sourceKey)
