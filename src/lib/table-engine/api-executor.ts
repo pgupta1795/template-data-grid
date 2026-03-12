@@ -96,9 +96,13 @@ export async function fetchSource(
 
       // Apply JSONata transform if configured
       const data = source.transform
-        ? await evaluateSourceExpr(source.transform, {
-            sources: { ...resolvedSources, [source.id]: raw },
-          })
+        ? await evaluateSourceExpr(
+            source.transform,
+            {
+              sources: { ...resolvedSources, [source.id]: raw },
+            },
+            raw
+          )
         : raw
 
       return { data, error: null }

@@ -30,18 +30,23 @@ export interface RowEvalContext {
  */
 export async function evaluateSourceExpr(
   expression: string,
-  context: SourceEvalContext
+  context: SourceEvalContext,
+  inputDoc?: unknown
 ): Promise<unknown> {
   if (!expression.trim()) return undefined
 
   try {
     const expr = jsonata(expression)
-    // Use the first source's data as the input document so that simple path
-    // expressions like `$.items` work against the primary source. The full
-    // source map is also exposed as `$sources` for cross-source references.
-    const inputDoc = Object.values(context.sources)[0] ?? {}
+    // Use provided inputDoc, or fall back to the first source's data
+    const effectiveInput =
+      inputDoc !== undefined
+        ? inputDoc
+        : (Object.values(context.sources)[0] ?? {})
+
     // JSONata bindings use keys WITHOUT the leading "$": key "sources" → $sources in expressions.
-    const result = await expr.evaluate(inputDoc, { sources: context.sources })
+    const result = await expr.evaluate(effectiveInput, {
+      sources: context.sources,
+    })
     return result
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

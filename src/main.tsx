@@ -5,6 +5,12 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import App from "./App.tsx"
 import "./index.css"
+import { installMockApiInterceptor } from "./demo/mock-api-interceptor"
+
+if (import.meta.env.DEV) {
+  installMockApiInterceptor()
+}
+
 
 const queryClient = new QueryClient({
   defaultOptions: {

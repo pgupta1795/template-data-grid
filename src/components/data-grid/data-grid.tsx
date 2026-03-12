@@ -339,6 +339,8 @@ export interface DataGridProps<TData extends GridRow> {
   isRefetching?: boolean
   /** Indicates if infinite scroll is currently fetching the next page. */
   isFetchingNextPage?: boolean
+  /** Indicates if data is currently loading */
+  isLoading?: boolean
   /** Callback fired when the user clicks the refresh button. */
   onRefresh?: () => void
   /**

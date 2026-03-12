@@ -10,6 +10,9 @@ import {
   generateMockRootNodes,
 } from "../utils/mock-data"
 import { demoBomColumns } from "./demo-columns"
+import { ConfiguredTable } from "../lib/table-engine/configured-table"
+import { bomEngineConfig } from "./bom-engine-config"
+
 
 // Flat mode — 10k rows, fully virtualized
 const flatData = generateMockBomData(10000)
@@ -64,6 +67,7 @@ export function DemoPage() {
           <TabsTrigger value="paginated">Paginated</TabsTrigger>
           <TabsTrigger value="infinite">Infinite</TabsTrigger>
           <TabsTrigger value="tree">Tree (BOM)</TabsTrigger>
+          <TabsTrigger value="engine">Engine (Config)</TabsTrigger>
         </TabsList>
 
         <TabsContent
@@ -155,6 +159,13 @@ export function DemoPage() {
               filtering: { enabled: true, mode: "client", filterRow: true },
             }}
           />
+        </TabsContent>
+
+        <TabsContent
+          value="engine"
+          className="min-h-0 flex-1 overflow-hidden data-[state=active]:flex data-[state=active]:flex-col h-[600px]"
+        >
+          <ConfiguredTable config={bomEngineConfig} className="h-full min-h-0 flex-1" />
         </TabsContent>
       </Tabs>
     </div>

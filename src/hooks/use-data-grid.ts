@@ -85,6 +85,8 @@ export interface DataGridConfig<TData extends GridRow> {
   isRefetching?: boolean
   /** Indicates if an infinite scroll query is fetching the next page */
   isFetchingNextPage?: boolean
+  /** Indicates if data is currently loading */
+  isLoading?: boolean
   /** Action handler for the toolbar refresh button */
   onRefresh?: () => void
   /** Required QueryKey for query-driven modes (paginated, infinite) */
@@ -130,6 +132,7 @@ export function useDataGrid<TData extends GridRow>(
     slots,
     isRefetching: externalIsRefetching = false,
     isFetchingNextPage: externalIsFetchingNextPage = false,
+    isLoading: externalIsLoading = false,
     onRefresh,
     initialColumnVisibility,
   } = config
@@ -420,11 +423,12 @@ export function useDataGrid<TData extends GridRow>(
 
   // Determine effective isLoading based on mode
   const isLoading =
-    mode === "paginated"
+    externalIsLoading ||
+    (mode === "paginated"
       ? paginatedQuery.isLoading
       : mode === "infinite"
         ? infiniteQuery.isLoading
-        : loadingState.isInitialLoading
+        : loadingState.isInitialLoading)
 
   return React.useMemo<DataGridContextValue>(
     () => ({
