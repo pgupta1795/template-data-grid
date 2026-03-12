@@ -1,16 +1,16 @@
-import { DataGrid } from "../components/data-grid"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import type { GridColumnDef } from "../types/column-types"
-import type { GridRow } from "../types/grid-types"
+import { DataGrid } from "@/components/data-grid"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type { GridColumnDef } from "@/components/data-grid/types/column-types"
+import type { GridRow } from "@/components/data-grid/types/grid-types"
 import {
   fetchBomInfinitePage,
   fetchBomPage,
   generateMockBomData,
   generateMockChildren,
   generateMockRootNodes,
-} from "../utils/mock-data"
+} from "@/utils/mock-data"
 import { demoBomColumns } from "./demo-columns"
-import { ConfiguredTable } from "../lib/table-engine/configured-table"
+import { ConfiguredTable } from "@/components/data-grid/table-engine/configured-table"
 import { bomEngineConfig } from "./bom-engine-config"
 
 

@@ -1,4 +1,4 @@
-import { stringColumn, numberColumn, selectColumn, multiValueColumn, booleanColumn, codeColumn, dateColumn } from '../columns'
+import { stringColumn, numberColumn, selectColumn, multiValueColumn, booleanColumn, codeColumn, dateColumn } from '@/components/data-grid/columns'
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },

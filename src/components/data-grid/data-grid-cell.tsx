@@ -1,13 +1,16 @@
+import { getEditor } from "@/components/data-grid/editors/get-editor"
+import { getPinnedShadowClass } from "@/components/data-grid/features/pinning/pinned-shadow"
+import type { ColumnMeta } from "@/components/data-grid/types/column-types"
+import type { GridRow } from "@/components/data-grid/types/grid-types"
+import {
+  formatDate,
+  formatNumber,
+} from "@/components/data-grid/utils/formatters"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell } from "@/components/ui/table"
-import { getEditor } from "@/editors/get-editor"
-import { getPinnedShadowClass } from "@/features/pinning/pinned-shadow"
 import { cn } from "@/lib/utils"
-import type { ColumnMeta } from "@/types/column-types"
-import type { GridRow } from "@/types/grid-types"
-import { formatDate, formatNumber } from "@/utils/formatters"
 import { flexRender, type Cell } from "@tanstack/react-table"
 import { Calendar, Check, Copy, X } from "lucide-react"
 import React, { memo, useCallback, useEffect, useRef, useState } from "react"
@@ -418,6 +421,7 @@ function DataGridCellInner({ cell, className }: DataGridCellProps) {
         )}
       >
         {meta?.renderEditor ? (
+          // eslint-disable-next-line react-hooks/refs
           meta.renderEditor({
             value,
             onChange: handleEditorChange,

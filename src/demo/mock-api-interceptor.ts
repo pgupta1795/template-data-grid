@@ -1,4 +1,4 @@
-import type { GridRow } from "@/types/grid-types"
+import type { GridRow } from "@/components/data-grid/types/grid-types"
 
 // Simulated delay
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))

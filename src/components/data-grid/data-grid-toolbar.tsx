@@ -1,4 +1,31 @@
-import { memo } from "react"
+import type { GridColumnDef } from "@/components/data-grid/types/column-types"
+import type {
+  GridDensity,
+  GridRow,
+} from "@/components/data-grid/types/grid-types"
+import { exportToCsv } from "@/components/data-grid/utils/csv-export"
+import {
+  clearAllFilters,
+  getColumnHeaderText,
+} from "@/components/data-grid/utils/grid-utils"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
 import {
   AlignJustify,
   Check,
@@ -11,29 +38,7 @@ import {
   Search,
   X,
 } from "lucide-react"
-import { Button, buttonVariants } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import type { GridDensity } from "@/types/grid-types"
-import { clearAllFilters, getColumnHeaderText } from "@/utils/grid-utils"
-import { exportToCsv } from "@/utils/csv-export"
-import type { GridColumnDef } from "@/types/column-types"
-import type { GridRow } from "@/types/grid-types"
+import { memo } from "react"
 import { useDataGridContext } from "./data-grid-context"
 
 const DENSITIES: GridDensity[] = ["compact", "normal", "comfortable"]
@@ -45,7 +50,7 @@ const SearchInput = memo(function SearchInput() {
 
   return (
     <div className="relative">
-      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+      <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
       <Input
         placeholder="Search..."
         value={globalFilter}
@@ -55,7 +60,7 @@ const SearchInput = memo(function SearchInput() {
       {globalFilter && (
         <button
           onClick={() => setGlobalFilter("")}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           aria-label="Clear search"
         >
           <X className="h-3.5 w-3.5" />
@@ -76,10 +81,10 @@ const ActiveFiltersBadge = memo(function ActiveFiltersBadge() {
   if (activeFilterCount === 0) return null
 
   return (
-    <div className="flex items-center gap-1 animate-in fade-in duration-150">
+    <div className="flex animate-in items-center gap-1 duration-150 fade-in">
       <span className="flex items-center gap-1 text-xs text-muted-foreground">
         <ListFilter className="h-3 w-3 text-primary" />
-        <span className="text-primary font-medium">{activeFilterCount}</span>
+        <span className="font-medium text-primary">{activeFilterCount}</span>
         <span>filter{activeFilterCount !== 1 ? "s" : ""}</span>
       </span>
       <Button
@@ -106,19 +111,23 @@ const ColumnVisibilityToggle = memo(function ColumnVisibilityToggle() {
   return (
     <Popover>
       <PopoverTrigger
-        className={buttonVariants({ variant: "ghost", size: "sm", className: "h-8 gap-1.5" })}
+        className={buttonVariants({
+          variant: "ghost",
+          size: "sm",
+          className: "h-8 gap-1.5",
+        })}
       >
         <Columns3 className="h-3.5 w-3.5" />
         <span className="text-xs">Columns</span>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-2" align="end">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground px-2 pb-1">
+        <div className="px-2 pb-1 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
           Toggle columns
         </div>
         {hideableColumns.map((col) => (
           <label
             key={col.id}
-            className="flex items-center gap-2 px-2 py-1 rounded hover:bg-muted/50 cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 hover:bg-muted/50"
           >
             <Checkbox
               checked={col.getIsVisible()}
@@ -140,20 +149,24 @@ const DensityControl = memo(function DensityControl() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className={buttonVariants({ variant: "ghost", size: "icon", className: "h-8 w-8" })}
+        className={buttonVariants({
+          variant: "ghost",
+          size: "icon",
+          className: "h-8 w-8",
+        })}
         title="Density"
       >
         <AlignJustify className="h-3.5 w-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          <DropdownMenuLabel className="text-[11px] tracking-wide text-muted-foreground uppercase">
             Density
           </DropdownMenuLabel>
           {DENSITIES.map((d) => (
             <DropdownMenuItem key={d} onClick={() => setDensity(d)}>
-              {density === d && <Check className="h-3.5 w-3.5 mr-2" />}
-              {density !== d && <span className="w-[calc(0.875rem+0.5rem)]" />}
+              {density === d && <Check className="mr-2 h-3.5 w-3.5" />}
+              {density !== d && <span className="w-5.5" />}
               <span className="capitalize">{d}</span>
             </DropdownMenuItem>
           ))}
@@ -273,12 +286,12 @@ const SelectionActionBar = memo(function SelectionActionBar() {
   const clearSelection = () => table.resetRowSelection()
 
   return (
-    <div className="flex items-center gap-2 px-3 h-10 bg-primary/5 border-b border-primary/20 text-sm animate-in slide-in-from-top-2 duration-200">
+    <div className="flex h-10 animate-in items-center gap-2 border-b border-primary/20 bg-primary/5 px-3 text-sm duration-200 slide-in-from-top-2">
       <Check className="h-3.5 w-3.5 text-primary" />
       <span className="font-medium text-primary">
         {selectedRows.length} row{selectedRows.length !== 1 ? "s" : ""} selected
       </span>
-      <Separator orientation="vertical" className="h-4 mx-1" />
+      <Separator orientation="vertical" className="mx-1 h-4" />
 
       {/* Custom slot for selection actions */}
       {slots?.selectionActions?.(selectedRows)}
@@ -297,7 +310,7 @@ const SelectionActionBar = memo(function SelectionActionBar() {
       <Button
         variant="ghost"
         size="sm"
-        className="h-7 gap-1.5 ml-auto"
+        className="ml-auto h-7 gap-1.5"
         onClick={clearSelection}
       >
         <X className="h-3.5 w-3.5" />
@@ -315,7 +328,7 @@ export const DataGridToolbar = memo(function DataGridToolbar() {
   return (
     <div>
       <SelectionActionBar />
-      <div className="sticky top-0 z-10 flex items-center gap-2 px-3 h-12 bg-background/80 backdrop-blur-md border-b border-border/60">
+      <div className="sticky top-0 z-10 flex h-12 items-center gap-2 border-b border-border/60 bg-background/80 px-3 backdrop-blur-md">
         {/* Left slot */}
         {slots?.toolbarLeft}
 

@@ -1,6 +1,6 @@
-import type { GridRow } from '../types/grid-types'
-import type { SortState } from '../types/sort-types'
-import type { FilterState } from '../types/filter-types'
+import type { GridRow } from '@/components/data-grid/types/grid-types'
+import type { SortState } from '@/components/data-grid/types/sort-types'
+import type { FilterState } from '@/components/data-grid/types/filter-types'
 
 const STATUS_OPTIONS = ['active', 'draft', 'obsolete', 'review'] as const
 const ALL_TAGS = ['mechanical', 'electrical', 'software', 'fastener', 'assembly', 'raw-material']

@@ -1,8 +1,8 @@
 import { memo } from "react"
 import { TableRow } from "@/components/ui/table"
-import { SkeletonCell } from "@/features/loading/skeleton-cell"
-import { getSkeletonWidth } from "@/utils/grid-utils"
-import type { ColumnType } from "@/types/column-types"
+import { SkeletonCell } from "@/components/data-grid/features/loading/skeleton-cell"
+import { getSkeletonWidth } from "@/components/data-grid/utils/grid-utils"
+import type { ColumnType } from "@/components/data-grid/types/column-types"
 
 interface SkeletonColumn {
   id: string

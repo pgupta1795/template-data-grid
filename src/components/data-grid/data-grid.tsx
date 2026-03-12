@@ -1,15 +1,15 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import type { InfiniteQueryFn, PaginatedQueryFn } from "@/hooks/use-data-grid"
-import { useDataGrid } from "@/hooks/use-data-grid"
+import type { InfiniteQueryFn, PaginatedQueryFn } from "@/components/data-grid/hooks/use-data-grid"
+import { useDataGrid } from "@/components/data-grid/hooks/use-data-grid"
 import { cn } from "@/lib/utils"
-import type { GridSlots } from "@/types"
-import type { GridColumnDef } from "@/types/column-types"
+import type { GridSlots } from "@/components/data-grid/types"
+import type { GridColumnDef } from "@/components/data-grid/types/column-types"
 import type {
   GridDensity,
   GridFeaturesConfig,
   GridMode,
   GridRow,
-} from "@/types/grid-types"
+} from "@/components/data-grid/types/grid-types"
 import {
   closestCenter,
   DndContext,

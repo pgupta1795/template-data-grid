@@ -6,13 +6,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ColumnFilterPopover } from "@/features/filtering/column-filter-popover"
-import { FilterRow } from "@/features/filtering/filter-row"
-import { getPinnedShadowClass } from "@/features/pinning/pinned-shadow"
-import { SortIndicator } from "@/features/sorting/sort-indicator"
+import { ColumnFilterPopover } from "@/components/data-grid/features/filtering/column-filter-popover"
+import { FilterRow } from "@/components/data-grid/features/filtering/filter-row"
+import { getPinnedShadowClass } from "@/components/data-grid/features/pinning/pinned-shadow"
+import { SortIndicator } from "@/components/data-grid/features/sorting/sort-indicator"
 import { cn } from "@/lib/utils"
-import type { ColumnType } from "@/types/column-types"
-import type { GridRow } from "@/types/grid-types"
+import type { ColumnType } from "@/components/data-grid/types/column-types"
+import type { GridRow } from "@/components/data-grid/types/grid-types"
 import {
   horizontalListSortingStrategy,
   SortableContext,

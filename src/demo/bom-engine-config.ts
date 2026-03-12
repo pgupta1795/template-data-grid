@@ -1,4 +1,4 @@
-import type { TableConfig } from "@/lib/table-engine/types"
+import type { TableConfig } from "@/components/data-grid/table-engine/types"
 
 /**
  * Demo BOM table config using the table engine.

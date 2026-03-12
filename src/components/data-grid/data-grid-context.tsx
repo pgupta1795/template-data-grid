@@ -1,17 +1,17 @@
-import React from "react"
-import type { Table, Row } from "@tanstack/react-table"
+import type { ActiveEdit } from "@/components/data-grid/features/editing/use-editing"
 import type {
-  GridRow,
+  ColVirtualizerInstance,
+  RowVirtualizerInstance,
+} from "@/components/data-grid/features/virtualization/use-virtualization"
+import type {
   GridDensity,
   GridFeaturesConfig,
   GridMode,
-} from "@/types/grid-types"
-import type { GridSlots } from "@/types/slot-types"
-import type {
-  RowVirtualizerInstance,
-  ColVirtualizerInstance,
-} from "@/features/virtualization/use-virtualization"
-import type { ActiveEdit } from "@/features/editing/use-editing"
+  GridRow,
+} from "@/components/data-grid/types/grid-types"
+import type { GridSlots } from "@/components/data-grid/types/slot-types"
+import type { Row, Table } from "@tanstack/react-table"
+import React from "react"
 
 export interface DataGridContextValue {
   table: Table<GridRow>
@@ -51,18 +51,14 @@ export interface DataGridContextValue {
   fetchNextPage: () => void
 }
 
-export const DataGridContext =
-  React.createContext<DataGridContextValue | null>(null)
+const DataGridContext = React.createContext<DataGridContextValue | null>(null)
 
 interface DataGridProviderProps {
   value: DataGridContextValue
   children: React.ReactNode
 }
 
-export function DataGridProvider({
-  value,
-  children,
-}: DataGridProviderProps) {
+export function DataGridProvider({ value, children }: DataGridProviderProps) {
   return (
     <DataGridContext.Provider value={value}>
       {children}
@@ -70,12 +66,11 @@ export function DataGridProvider({
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDataGridContext(): DataGridContextValue {
   const context = React.useContext(DataGridContext)
   if (context === null) {
-    throw new Error(
-      "useDataGridContext must be used within a DataGridProvider",
-    )
+    throw new Error("useDataGridContext must be used within a DataGridProvider")
   }
   return context
 }
