@@ -1,0 +1,557 @@
+[
+  {
+    "name": "data-grid-core",
+    "description": "Core DataGrid component with hooks, types, and utilities. Includes use-data-grid orchestration, filtering, sorting, selection state, virtualization integration, and tree-mode support.",
+    "type": "components",
+    "files": [
+      {
+        "path": "src/components/data-grid/data-grid.tsx",
+        "target": "components/data-grid/data-grid.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-context.tsx",
+        "target": "components/data-grid/data-grid-context.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-header.tsx",
+        "target": "components/data-grid/data-grid-header.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-row.tsx",
+        "target": "components/data-grid/data-grid-row.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-cell.tsx",
+        "target": "components/data-grid/data-grid-cell.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-toolbar.tsx",
+        "target": "components/data-grid/data-grid-toolbar.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-pagination.tsx",
+        "target": "components/data-grid/data-grid-pagination.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-empty.tsx",
+        "target": "components/data-grid/data-grid-empty.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-skeleton.tsx",
+        "target": "components/data-grid/data-grid-skeleton.tsx"
+      },
+      {
+        "path": "src/components/data-grid/data-grid-row-skeleton.tsx",
+        "target": "components/data-grid/data-grid-row-skeleton.tsx"
+      },
+      {
+        "path": "src/components/data-grid/hooks/use-data-grid.ts",
+        "target": "components/data-grid/hooks/use-data-grid.ts"
+      },
+      {
+        "path": "src/components/data-grid/hooks/use-column-resize.ts",
+        "target": "components/data-grid/hooks/use-column-resize.ts"
+      },
+      {
+        "path": "src/components/data-grid/hooks/use-infinite-data.ts",
+        "target": "components/data-grid/hooks/use-infinite-data.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/grid-types.ts",
+        "target": "components/data-grid/types/grid-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/column-types.ts",
+        "target": "components/data-grid/types/column-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/filter-types.ts",
+        "target": "components/data-grid/types/filter-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/sort-types.ts",
+        "target": "components/data-grid/types/sort-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/editor-types.ts",
+        "target": "components/data-grid/types/editor-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/slot-types.ts",
+        "target": "components/data-grid/types/slot-types.ts"
+      },
+      {
+        "path": "src/components/data-grid/types/index.ts",
+        "target": "components/data-grid/types/index.ts"
+      },
+      {
+        "path": "src/components/data-grid/utils/grid-utils.ts",
+        "target": "components/data-grid/utils/grid-utils.ts"
+      },
+      {
+        "path": "src/components/data-grid/utils/formatters.ts",
+        "target": "components/data-grid/utils/formatters.ts"
+      },
+      {
+        "path": "src/components/data-grid/utils/csv-export.ts",
+        "target": "components/data-grid/utils/csv-export.ts"
+      },
+      {
+        "path": "src/components/data-grid/index.ts",
+        "target": "components/data-grid/index.ts"
+      }
+    ],
+    "dependencies": [
+      "@tanstack/react-table@^8.21.3",
+      "@tanstack/react-query@^5.90.21",
+      "@tanstack/react-virtual@^3.13.21",
+      "@dnd-kit/core@^6.3.1",
+      "@dnd-kit/sortable@^10.0.0",
+      "@dnd-kit/utilities@^3.2.2",
+      "date-fns@^4.1.0",
+      "clsx@^2.1.1",
+      "match-sorter@^8.2.0",
+      "@tanstack/match-sorter-utils@^8.19.4"
+    ],
+    "devDependencies": [],
+    "registryDependencies": [
+      "table",
+      "button",
+      "popover",
+      "dropdown-menu",
+      "select",
+      "dialog",
+      "calendar",
+      "input"
+    ]
+  },
+  {
+    "name": "data-grid-columns",
+    "description": "Typed column factory helpers for string, number, boolean, select, multi-value, date, and code columns.",
+    "type": "components",
+    "files": [
+      {
+        "path": "src/components/data-grid/columns/string-column.tsx",
+        "target": "components/data-grid/columns/string-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/number-column.tsx",
+        "target": "components/data-grid/columns/number-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/boolean-column.tsx",
+        "target": "components/data-grid/columns/boolean-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/select-column.tsx",
+        "target": "components/data-grid/columns/select-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/multi-value-column.tsx",
+        "target": "components/data-grid/columns/multi-value-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/date-column.tsx",
+        "target": "components/data-grid/columns/date-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/code-column.tsx",
+        "target": "components/data-grid/columns/code-column.tsx"
+      },
+      {
+        "path": "src/components/data-grid/columns/index.ts",
+        "target": "components/data-grid/columns/index.ts"
+      }
+    ],
+    "dependencies": [
+      "lucide-react@^0.577.0"
+    ],
+    "devDependencies": [],
+    "registryDependencies": [
+      "input",
+      "badge",
+      "button",
+      "select"
+    ]
+  },
+  {
+    "name": "data-grid-editors",
+    "description": "Cell editor components for inline editing across column types (text, number, select, date, boolean, code, chips).",
+    "type": "components",
+    "files": [
+      {
+        "path": "src/components/data-grid/editors/text-editor.tsx",
+        "target": "components/data-grid/editors/text-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/number-editor.tsx",
+        "target": "components/data-grid/editors/number-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/boolean-editor.tsx",
+        "target": "components/data-grid/editors/boolean-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/select-editor.tsx",
+        "target": "components/data-grid/editors/select-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/date-editor.tsx",
+        "target": "components/data-grid/editors/date-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/code-editor.tsx",
+        "target": "components/data-grid/editors/code-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/chip-editor.tsx",
+        "target": "components/data-grid/editors/chip-editor.tsx"
+      },
+      {
+        "path": "src/components/data-grid/editors/get-editor.ts",
+        "target": "components/data-grid/editors/get-editor.ts"
+      },
+      {
+        "path": "src/components/data-grid/editors/index.ts",
+        "target": "components/data-grid/editors/index.ts"
+      }
+    ],
+    "dependencies": [
+      "lucide-react@^0.577.0"
+    ],
+    "devDependencies": [],
+    "registryDependencies": [
+      "input",
+      "select",
+      "checkbox",
+      "popover",
+      "button",
+      "calendar"
+    ]
+  },
+  {
+    "name": "data-grid-features",
+    "description": "Modular feature implementations: filtering, sorting, selection, pinning, grouping, editing, tree expansion, virtualization, column ordering, and loading states.",
+    "type": "components",
+    "files": [
+      {
+        "path": "src/components/data-grid/features/filtering/column-filter-popover.tsx",
+        "target": "components/data-grid/features/filtering/column-filter-popover.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/filtering/facet-badge.tsx",
+        "target": "components/data-grid/features/filtering/facet-badge.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/filtering/filter-functions.ts",
+        "target": "components/data-grid/features/filtering/filter-functions.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/filtering/filter-row.tsx",
+        "target": "components/data-grid/features/filtering/filter-row.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/filtering/fuzzy-filter.ts",
+        "target": "components/data-grid/features/filtering/fuzzy-filter.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/filtering/use-filtering.ts",
+        "target": "components/data-grid/features/filtering/use-filtering.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/sorting/sort-indicator.tsx",
+        "target": "components/data-grid/features/sorting/sort-indicator.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/sorting/use-sorting.ts",
+        "target": "components/data-grid/features/sorting/use-sorting.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/selection/selection-cell.tsx",
+        "target": "components/data-grid/features/selection/selection-cell.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/selection/use-selection.ts",
+        "target": "components/data-grid/features/selection/use-selection.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/pinning/pinned-shadow.tsx",
+        "target": "components/data-grid/features/pinning/pinned-shadow.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/pinning/use-column-pinning.ts",
+        "target": "components/data-grid/features/pinning/use-column-pinning.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/pinning/use-row-pinning.ts",
+        "target": "components/data-grid/features/pinning/use-row-pinning.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/grouping/group-row.tsx",
+        "target": "components/data-grid/features/grouping/group-row.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/grouping/use-grouping.ts",
+        "target": "components/data-grid/features/grouping/use-grouping.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/editing/optimistic-update.ts",
+        "target": "components/data-grid/features/editing/optimistic-update.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/editing/use-editing.ts",
+        "target": "components/data-grid/features/editing/use-editing.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/tree/expand-toggle.tsx",
+        "target": "components/data-grid/features/tree/expand-toggle.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/tree/use-lazy-expand.ts",
+        "target": "components/data-grid/features/tree/use-lazy-expand.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/virtualization/use-virtualization.ts",
+        "target": "components/data-grid/features/virtualization/use-virtualization.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/ordering/use-column-ordering.ts",
+        "target": "components/data-grid/features/ordering/use-column-ordering.ts"
+      },
+      {
+        "path": "src/components/data-grid/features/loading/skeleton-cell.tsx",
+        "target": "components/data-grid/features/loading/skeleton-cell.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/loading/skeleton-header-group.tsx",
+        "target": "components/data-grid/features/loading/skeleton-header-group.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/loading/skeleton-header.tsx",
+        "target": "components/data-grid/features/loading/skeleton-header.tsx"
+      },
+      {
+        "path": "src/components/data-grid/features/loading/use-loading-state.ts",
+        "target": "components/data-grid/features/loading/use-loading-state.ts"
+      }
+    ],
+    "dependencies": [
+      "@dnd-kit/core@^6.3.1",
+      "@dnd-kit/sortable@^10.0.0",
+      "@dnd-kit/utilities@^3.2.2",
+      "lucide-react@^0.577.0"
+    ],
+    "devDependencies": [],
+    "registryDependencies": [
+      "popover",
+      "button",
+      "input",
+      "checkbox",
+      "calendar",
+      "select"
+    ]
+  },
+  {
+    "name": "data-grid-table-engine",
+    "description": "Config-driven table system for declarative table configuration using DAG resolution and JSONata transforms (Phase 14+).",
+    "type": "components",
+    "files": [],
+    "dependencies": [],
+    "devDependencies": [],
+    "registryDependencies": []
+  },
+  {
+    "name": "data-grid-docs",
+    "description": "Documentation and guides for the data-grid system (reference only, not installable via shadcn add).",
+    "type": "docs",
+    "files": [
+      {
+        "path": "docs/superpowers/specs/2026-03-11-data-grid-design.md",
+        "target": "data-grid-docs/specs/2026-03-11-data-grid-design.md"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-03-12-table-engine-design.md",
+        "target": "data-grid-docs/specs/2026-03-12-table-engine-design.md"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-03-12-data-grid-docs-design.md",
+        "target": "data-grid-docs/specs/2026-03-12-data-grid-docs-design.md"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-03-12-shadcn-registry-integration-design.md",
+        "target": "data-grid-docs/specs/2026-03-12-shadcn-registry-integration-design.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-01-foundation.md",
+        "target": "data-grid-docs/plans/phase-01-foundation.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-02-core-rendering.md",
+        "target": "data-grid-docs/plans/phase-02-core-rendering.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-03-sorting-filtering.md",
+        "target": "data-grid-docs/plans/phase-03-sorting-filtering.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-04-selection-pinning-grouping.md",
+        "target": "data-grid-docs/plans/phase-04-selection-pinning-grouping.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-05-tree-virtualization.md",
+        "target": "data-grid-docs/plans/phase-05-tree-virtualization.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-06-editing-mutations.md",
+        "target": "data-grid-docs/plans/phase-06-editing-mutations.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-07-toolbar-skeleton.md",
+        "target": "data-grid-docs/plans/phase-07-toolbar-skeleton.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-08-data-modes.md",
+        "target": "data-grid-docs/plans/phase-08-data-modes.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-09-polish-demo.md",
+        "target": "data-grid-docs/plans/phase-09-polish-demo.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-10-table-engine-foundation.md",
+        "target": "data-grid-docs/plans/phase-10-table-engine-foundation.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-11-dag-jsonata.md",
+        "target": "data-grid-docs/plans/phase-11-dag-jsonata.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-12-api-executor.md",
+        "target": "data-grid-docs/plans/phase-12-api-executor.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-13-column-builder.md",
+        "target": "data-grid-docs/plans/phase-13-column-builder.md"
+      },
+      {
+        "path": "docs/superpowers/plans/phase-14-hook-component-demo.md",
+        "target": "data-grid-docs/plans/phase-14-hook-component-demo.md"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-03-12-data-grid-docs-implementation.md",
+        "target": "data-grid-docs/plans/2026-03-12-data-grid-docs-implementation.md"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-03-12-shadcn-registry-implementation.md",
+        "target": "data-grid-docs/plans/2026-03-12-shadcn-registry-implementation.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/README.md",
+        "target": "data-grid-docs/grid-docs/README.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/01-quick-start.md",
+        "target": "data-grid-docs/grid-docs/01-quick-start.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/02-progressive-walkthrough.md",
+        "target": "data-grid-docs/grid-docs/02-progressive-walkthrough.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/sorting.md",
+        "target": "data-grid-docs/grid-docs/03-features/sorting.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/filtering.md",
+        "target": "data-grid-docs/grid-docs/03-features/filtering.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/selection.md",
+        "target": "data-grid-docs/grid-docs/03-features/selection.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/pinning.md",
+        "target": "data-grid-docs/grid-docs/03-features/pinning.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/grouping.md",
+        "target": "data-grid-docs/grid-docs/03-features/grouping.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/editing.md",
+        "target": "data-grid-docs/grid-docs/03-features/editing.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/tree-expansion.md",
+        "target": "data-grid-docs/grid-docs/03-features/tree-expansion.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/03-features/virtualization.md",
+        "target": "data-grid-docs/grid-docs/03-features/virtualization.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/04-data-modes-non-config/flat-mode.md",
+        "target": "data-grid-docs/grid-docs/04-data-modes-non-config/flat-mode.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/04-data-modes-non-config/paginated-mode.md",
+        "target": "data-grid-docs/grid-docs/04-data-modes-non-config/paginated-mode.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/04-data-modes-non-config/infinite-mode.md",
+        "target": "data-grid-docs/grid-docs/04-data-modes-non-config/infinite-mode.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/04-data-modes-non-config/tree-mode.md",
+        "target": "data-grid-docs/grid-docs/04-data-modes-non-config/tree-mode.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/config-basics.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/config-basics.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/jsonata-transforms.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/jsonata-transforms.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/flat-table-config.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/flat-table-config.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/infinite-table-config.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/infinite-table-config.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/tree-table-config.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/tree-table-config.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/05-config-driven-tables/config-api-reference.md",
+        "target": "data-grid-docs/grid-docs/05-config-driven-tables/config-api-reference.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/06-customization/custom-columns.md",
+        "target": "data-grid-docs/grid-docs/06-customization/custom-columns.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/06-customization/custom-editors.md",
+        "target": "data-grid-docs/grid-docs/06-customization/custom-editors.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/06-customization/styling-theming.md",
+        "target": "data-grid-docs/grid-docs/06-customization/styling-theming.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/06-customization/custom-features.md",
+        "target": "data-grid-docs/grid-docs/06-customization/custom-features.md"
+      },
+      {
+        "path": "src/components/data-grid/docs/07-api-reference.md",
+        "target": "data-grid-docs/grid-docs/07-api-reference.md"
+      }
+    ],
+    "dependencies": [],
+    "devDependencies": [],
+    "registryDependencies": []
+  }
+]
