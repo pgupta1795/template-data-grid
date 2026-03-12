@@ -91,6 +91,12 @@ export interface DataGridConfig<TData extends GridRow> {
   queryKey?: QueryKey
   /** Data fetching query function for server modes */
   queryFn?: PaginatedQueryFn<TData> | InfiniteQueryFn<TData>
+  /**
+   * Initial column visibility state. Columns listed as false are hidden on mount.
+   * Produced by the table engine's column-builder from ColumnConfig.visible settings.
+   * Example: { internalCode: false, notes: false }
+   */
+  initialColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -125,12 +131,13 @@ export function useDataGrid<TData extends GridRow>(
     isRefetching: externalIsRefetching = false,
     isFetchingNextPage: externalIsFetchingNextPage = false,
     onRefresh,
+    initialColumnVisibility,
   } = config
 
   const [density, setDensity] = React.useState<GridDensity>(initialDensity)
   const [columnVisibility, setColumnVisibility] = React.useState<
     Record<string, boolean>
-  >({})
+  >(initialColumnVisibility ?? {})
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
   // Pagination state (for paginated mode)

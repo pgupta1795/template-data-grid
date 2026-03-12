@@ -341,6 +341,11 @@ export interface DataGridProps<TData extends GridRow> {
   isFetchingNextPage?: boolean
   /** Callback fired when the user clicks the refresh button. */
   onRefresh?: () => void
+  /**
+   * Initial column visibility state. Columns with false are hidden on mount.
+   * Produced by the table engine — no need to set manually when using ConfiguredTable.
+   */
+  initialColumnVisibility?: Record<string, boolean>
 }
 
 /**
