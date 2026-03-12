@@ -56,5 +56,7 @@ export function useInfiniteData<TData extends GridRow>(
     fetchNextPage: query.fetchNextPage,
     refetch: query.refetch,
     isRefetching: query.isRefetching,
+    isError: query.isError,
+    error: query.error,
   }
 }
