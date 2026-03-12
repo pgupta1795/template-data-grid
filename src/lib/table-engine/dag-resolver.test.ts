@@ -74,6 +74,15 @@ describe("buildWaves", () => {
     expect(() => buildWaves(sources)).toThrow(/nonexistent/)
   })
 
+  it("throws ConfigError on duplicate dependency entries", () => {
+    const sources: DataSourceConfig[] = [
+      { id: "bom", url: "/api/bom" },
+      { id: "a", url: "/api/a", dependsOn: ["bom", "bom"] },
+    ]
+    expect(() => buildWaves(sources)).toThrow(ConfigError)
+    expect(() => buildWaves(sources)).toThrow(/bom/)
+  })
+
   it("throws ConfigError with cycle path in message", () => {
     const sources: DataSourceConfig[] = [
       { id: "x", url: "/x", dependsOn: ["y"] },

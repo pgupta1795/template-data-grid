@@ -40,6 +40,7 @@ export async function evaluateSourceExpr(
     // expressions like `$.items` work against the primary source. The full
     // source map is also exposed as `$sources` for cross-source references.
     const inputDoc = Object.values(context.sources)[0] ?? {}
+    // JSONata bindings use keys WITHOUT the leading "$": key "sources" → $sources in expressions.
     const result = await expr.evaluate(inputDoc, { sources: context.sources })
     return result
   } catch (err) {
